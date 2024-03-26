@@ -1,4 +1,4 @@
-# The Transform Deploy Instruction File Format
+# File Format
 
 Instruction Files are YAML files consisting of a list of [Transformations](#transformations). To learn more about the YAML file format, visit [yaml.org](https://yaml.org/).
 

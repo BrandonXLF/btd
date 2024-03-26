@@ -1,17 +1,25 @@
-# `tdep` - Transform Deploy
+# Transform Deploy
 
-Create and deploy production builds of projects (apps, websites, etc.) using recipes of file transformation and shell commands using convenient YAML [Instruction Files](#instruction-files) files.
+<div style="font-size: 1.35rem">Production build to deployment file transformer</div>
 
-## Instruction Files
+---
 
-An Instruction File is a YAML file containing a list of Transformations to perform for a project. Read [The Transform Deploy Instruction File Format](docs/file-format.md) to learn about the format.
+Transform production builds of projects using file operations and commands into a deployment-ready state forms and deploy them.
 
-### Running Instruction Files
+## Features
 
-Instruction Files are run with the `tdep [<name>]` command. If no `<name>` is specified, the script in [The Library](#the-library) with its meta `dir` set to the current directory will be run. Otherwise, the `<name>` script will be run if it exists, and if it doesn't, the script with the name `<name>` in [The Library](#the-library) will be run. `.yml` is added to `<name>` as required.
+### Convenient File Format
 
-## The Library
+Transformations are stored in [Instruction Files](https://brandonxlf.github.io/tdep/file-format) that are created using the easy to edit YAML file format. YAML makes it trivial to define multiline strings strings wile requiring minimal syntax.
 
-The Library is a computer-wide collection of recipes. It allows for storing transformation recipes outside of project directories. This allows for the separation of the, potentially open-source, project and specific recipes for deploying it to proprietary environments.
+### Computer-Wide Store
 
-The Library can be managed with the `tdep <--create | --delete | --edit | --list | --open | --rename>` commands.
+Instructions can be in codebase or in a [computer-wide library](https://brandonxlf.github.io/tdep/the-library) that allows for the separation of open-source projects from the specific instructions for deploying it to proprietary environments.
+
+## Documentation
+
+You can find the Transform Deploy documentation on [the website](https://brandonxlf.github.io/tdep/).
+
+## Developing
+
+Transform Deploy is build using Rust and Cargo. View [Cargo's documentation](https://doc.rust-lang.org/cargo/guide/working-on-an-existing-project.html) to learn more about developing with Cargo.

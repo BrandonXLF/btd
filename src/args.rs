@@ -46,7 +46,11 @@ The Library
 
 Program Information
     --help          Show this help message and exit.
-    --version       Print the version of tdep and exit.");
+    --version       Print the version of tdep and exit.
+
+Instruction File Format
+    Visit https://brandonxlf.github.io/tdep/docs/file-format for information in the Instruction File
+    file format.");
 
     Ok(())
 }

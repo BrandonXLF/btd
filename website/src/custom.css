@@ -1,0 +1,19 @@
+:root {
+    --color-primary-100: #b8e8f9;
+    --color-primary-200: #8bd9f5;
+    --color-primary-300: #63caf1;
+    --color-primary-400: #4bbeee;
+    --color-primary-500: #3cb2ec;
+    --color-primary-600: #36a4de;
+    --color-primary-700: #2e91ca;
+    --color-primary-800: #2b80b6;
+    --color-primary-900: #216094;
+
+    --ifm-color-primary: var(--color-primary-600);
+    --ifm-link-color: var(--color-primary-600);
+}
+
+[data-theme='dark'] {
+    --ifm-color-primary: var(--color-primary-500);
+    --ifm-link-color: var(--color-primary-300);
+}
