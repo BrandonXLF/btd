@@ -10,7 +10,7 @@ description: Transform and deploy production builds of projects with file operat
 
 ---
 
-`btd` allows you to transform and deploy production builds of projects with file operations and commands using easy to write YAML files.
+`btd` allows you to transform and deploy production builds of projects with file operations and commands using easy to edit YAML files.
 
 ## Convenient File Format
 
