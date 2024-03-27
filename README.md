@@ -1,8 +1,6 @@
 # btd
 
-<div style="font-size: 1.35rem">Production build to deployment file transformer</div>
-
----
+## Build. Transform. Deploy.
 
 `btd` allows you to transform and deploy production builds of projects with file operations and commands using easy to edit YAML files.
 
