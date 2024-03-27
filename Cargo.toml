@@ -4,6 +4,7 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
+dirs = "5.0.1"
 edit = "0.1.5"
 open = "5.1.2"
 regex = "1.10.3"

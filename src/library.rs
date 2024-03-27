@@ -17,9 +17,8 @@ pub struct Library {
 
 impl Library {
     pub fn new() -> Result<Library, Box<dyn Error>> {
-        let mut dir = env::current_exe().map_err(|_| "Failed to get current directory")?;
-        dir.pop();
-        dir.push("library");
+        let mut dir = dirs::data_dir().ok_or_else(|| "Failed to get config directory")?;
+        dir.push("btd-library");
 
         return Ok(Library { dir });
     }

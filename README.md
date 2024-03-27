@@ -10,9 +10,9 @@
 
 Transformations are stored in [Instruction Files](https://brandonxlf.github.io/btd/file-format) that are created using the easy-to-edit YAML file format. YAML makes it trivial to define multiline strings strings wile requiring minimal syntax.
 
-### Computer-Wide Store
+### User-Wide Store
 
-Instructions can be in codebase or in a [computer-wide library](https://brandonxlf.github.io/btd/the-library) that allows for the separation of open-source projects from the specific instructions for deploying it to proprietary environments.
+Instructions can be in codebase or in a [user-wide library](https://brandonxlf.github.io/btd/the-library) that allows for the separation of open-source projects from the specific instructions for deploying it to proprietary environments.
 
 ## Documentation
 
