@@ -4,7 +4,7 @@
 
 ---
 
-btd allows you to transform and deploy production builds of projects with file operations and commands using easy to write YAML files.
+`btd` allows you to transform and deploy production builds of projects with file operations and commands using easy to write YAML files.
 
 ## Features
 
@@ -18,8 +18,8 @@ Instructions can be in codebase or in a [computer-wide library](https://brandonx
 
 ## Documentation
 
-You can find the btd documentation on [the website](https://brandonxlf.github.io/btd/).
+You can find the `btd` documentation on [the website](https://brandonxlf.github.io/btd/).
 
 ## Developing
 
-btd is build using Rust and Cargo. View [Cargo's documentation](https://doc.rust-lang.org/cargo/guide/working-on-an-existing-project.html) to learn more about developing with Cargo.
+`btd` is build using Rust and Cargo. View [Cargo's documentation](https://doc.rust-lang.org/cargo/guide/working-on-an-existing-project.html) to learn more about developing with Cargo.
