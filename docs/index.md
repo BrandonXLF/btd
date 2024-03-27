@@ -1,3 +1,9 @@
+---
+title: Build. Transform. Deploy.
+sidebar_label: btd
+description: Transform and deploy production builds of projects with file operations and commands using easy to write YAML files.
+---
+
 # btd
 
 <div style={{fontSize: '1.75rem'}}>Build. Transform. Deploy.</div>
