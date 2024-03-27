@@ -4,7 +4,7 @@
 
 ---
 
-Transform production builds of projects with file operations and commands into a deployment-ready state and deploy them.
+btd allows you to transform and deploy production builds of projects with file operations and commands using easy to write YAML files.
 
 ## Convenient File Format
 
