@@ -1,0 +1,15 @@
+<svg version="1.1" width="200" height="200" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        text {
+            fill: white;
+            font: normal 16px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+        }
+        
+        .main {
+            fill: #3cb2ec;
+        }
+    </style>
+    <text x="-1" y="11.75" class="main">[</text>
+    <text x="4.5" y="11.75" class="main">t</text>
+    <text x="11" y="11.75" class="main">]</text>
+</svg>

@@ -6,7 +6,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 const config = {
     title: 'btd',
     tagline: 'Build. Transform. Deploy.',
-    favicon: 'img/favicon.ico',
+    favicon: 'img/favicon.svg',
     url: 'https://brandonxlf.github.io',
     baseUrl: '/btd/',
     organizationName: 'brandonxlf',
@@ -37,7 +37,13 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     themeConfig: {
         navbar: {
-            title: 'btd',
+            logo: {
+                alt: 'btd',
+                src: 'img/logo.svg',
+                srcDark: 'img/logo-dark.svg',
+                height: '32px',
+                width: '64px'
+            },
             items: [
                 {
                     type: 'docSidebar',
