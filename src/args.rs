@@ -21,10 +21,10 @@ pub fn process_args(args: Vec<String>) -> Result<(), Box<dyn Error>> {
 }
 
 pub fn show_help() -> Result<(), Box<dyn Error>> {
-    println!("Usage: tdep [<name>]
-       tdep <--create | --delete | --edit | --rename> [<name>]
-       tdep <--list | --open>
-       tdep <--help | --version>
+    println!("Usage: btd [<name>]
+       btd <--create | --delete | --edit | --rename> [<name>]
+       btd <--list | --open>
+       btd <--help | --version>
 
 Running Instruction Files
     [<name>]    If no <name> is specified, the script in The Library with its meta dir set to the
@@ -46,10 +46,10 @@ The Library
 
 Program Information
     --help          Show this help message and exit.
-    --version       Print the version of tdep and exit.
+    --version       Print the version of btd and exit.
 
 Instruction File Format
-    Visit https://brandonxlf.github.io/tdep/docs/file-format for information in the Instruction File
+    Visit https://brandonxlf.github.io/btd/docs/file-format for information in the Instruction File
     file format.");
 
     Ok(())

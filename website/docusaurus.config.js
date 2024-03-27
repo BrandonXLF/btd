@@ -4,13 +4,13 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'Transform Deploy',
-    tagline: 'Production build to deployment file transformer',
+    title: 'btd',
+    tagline: 'Build. Transform. Deploy.',
     favicon: 'img/favicon.ico',
     url: 'https://brandonxlf.github.io',
-    baseUrl: '/tdep/',
+    baseUrl: '/btd/',
     organizationName: 'brandonxlf',
-    projectName: 'tdep',
+    projectName: 'btd',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'throw',
     i18n: {
@@ -26,7 +26,7 @@ const config = {
                     path: '../docs',
                     routeBasePath: '/',
                     sidebarPath: './sidebars.js',
-                    editUrl: 'https://github.com/brandonxlf/tdep/tree/main/website/',
+                    editUrl: 'https://github.com/brandonxlf/btd/tree/main/website/',
                 },
                 theme: {
                     customCss: './src/custom.css',
@@ -37,7 +37,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     themeConfig: {
         navbar: {
-            title: 'Transform Deploy',
+            title: 'btd',
             items: [
                 {
                     type: 'docSidebar',
@@ -46,7 +46,7 @@ const config = {
                     label: 'Docs',
                 },
                 {
-                    href: 'https://github.com/brandonxlf/tdep',
+                    href: 'https://github.com/brandonxlf/btd',
                     label: 'GitHub',
                     position: 'right',
                 },

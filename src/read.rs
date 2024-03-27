@@ -32,7 +32,7 @@ fn resolve_name_or_path(name_or_path: &str) -> Result<PathBuf, Box<dyn Error>> {
     } else if let Some(path) = Library::new()?.resolve_name(name_or_path) {
         Ok(path)
     } else {
-        return Err("No recipe found. Run tdep --list to see available recipes.".into());
+        return Err("No recipe found. Run btd --list to see available recipes.".into());
     }
 }
 

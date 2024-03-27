@@ -18,6 +18,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
 
 [[package]]
+name = "btd"
+version = "1.0.0"
+dependencies = [
+ "edit",
+ "open",
+ "regex",
+ "serde",
+ "serde_yaml",
+ "system",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -267,18 +279,6 @@ name = "system"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bf0010af984f1607939cf5f64a332bfbde3c533219b60dd96b8996c258cfc03a"
-
-[[package]]
-name = "tdep"
-version = "1.0.0"
-dependencies = [
- "edit",
- "open",
- "regex",
- "serde",
- "serde_yaml",
- "system",
-]
 
 [[package]]
 name = "tempfile"

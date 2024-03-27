@@ -158,6 +158,6 @@ impl Library {
             }
         }
 
-        return Err("No recipe matches the current directory. Run tdep --help for help.".into());
+        return Err("No recipe matches the current directory. Run btd --help for help.".into());
     }
 }
