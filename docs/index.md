@@ -4,7 +4,7 @@
 
 ---
 
-Transform production builds of projects using file operations and commands into a deployment-ready state forms and deploy them.
+Transform production builds of projects with file operations and commands into a deployment-ready state and deploy them.
 
 ## Convenient File Format
 
