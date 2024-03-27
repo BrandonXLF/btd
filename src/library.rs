@@ -1,7 +1,7 @@
 use std::{
     env,
     error::Error,
-    fs::{read_dir, remove_file, rename, File},
+    fs::{self, read_dir, remove_file, rename, File},
     io::{stdin, stdout, Write},
     path::PathBuf,
 };
@@ -19,6 +19,8 @@ impl Library {
     pub fn new() -> Result<Library, Box<dyn Error>> {
         let mut dir = dirs::data_dir().ok_or_else(|| "Failed to get config directory")?;
         dir.push("btd-library");
+
+        fs::create_dir_all(&dir).map_err(|_| "Could not make library directory")?;
 
         return Ok(Library { dir });
     }
