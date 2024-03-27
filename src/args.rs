@@ -49,7 +49,7 @@ Program Information
     --version       Print the version of btd and exit.
 
 Instruction File Format
-    Visit https://brandonxlf.github.io/btd/docs/file-format for information in the Instruction File
+    Visit https://brandonxlf.github.io/btd/file-format/ for information in the Instruction File
     file format.");
 
     Ok(())
