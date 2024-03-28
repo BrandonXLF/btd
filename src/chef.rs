@@ -88,13 +88,30 @@ impl Chef<'_> {
                 let cmd = step.get_req_str("cmd", i)?;
                 self.show_status(&step_type, &cmd);
 
+                let mut rust_cmd = Command::system(&cmd);
+
                 let cwd = step
                     .get_opt_str("cwd", i)?
                     .map(Path::new)
                     .unwrap_or(self.dir);
 
-                let success = Command::system(&cmd)
-                    .current_dir(cwd)
+                rust_cmd.current_dir(cwd);
+
+                if let Some(envs) = step.get_opt_map("env", i)? {
+                    for (name, val) in envs.iter() {
+                        let name_str = name.as_str().ok_or_else(|| -> Box<dyn Error> {
+                            "Environment variable key must be a string".into()
+                        })?;
+
+                        let val_str = val.as_str().ok_or_else(|| -> Box<dyn Error> {
+                            "Environment variable value must be a string".into()
+                        })?;
+
+                        rust_cmd.env(name_str, val_str);
+                    }
+                }
+
+                let success = rust_cmd
                     .status()
                     .map_err(|_| format!("Failed to run command {}", cmd))?
                     .success();
@@ -188,7 +205,8 @@ impl Chef<'_> {
                 if !path.is_dir() {
                     fs::remove_file(name).map_err(|_| "Unable to delete file")?;
                 } else if recursive {
-                    fs::remove_dir_all(path).map_err(|_| "Unable to recursively delete directory")?;
+                    fs::remove_dir_all(path)
+                        .map_err(|_| "Unable to recursively delete directory")?;
                 } else {
                     if let Ok(mut contents) = path.read_dir() {
                         if contents.next().is_some() {

@@ -4,15 +4,15 @@ use serde::Serialize;
 use serde_yaml::{Mapping, Value};
 
 pub type Transformation = Mapping;
+trait InternalTrait<T, V> {
+    fn get_raw_value(&self, key: &str, i: usize) -> Result<&V, Box<dyn Error>>;
+}
 
 pub trait TransformationTrait<T, V> {
     fn get_opt_str(&self, key: &str, i: usize) -> Result<Option<&str>, Box<dyn Error>>;
     fn get_req_str(&self, key: &str, i: usize) -> Result<&str, Box<dyn Error>>;
     fn get_opt_in_bool(&self, key: &str, i: usize) -> Result<bool, Box<dyn Error>>;
-}
-
-trait InternalTrait<T, V> {
-    fn get_raw_value(&self, key: &str, i: usize) -> Result<&V, Box<dyn Error>>;
+    fn get_opt_map(&self, key: &str, i: usize) -> Result<Option<&Mapping>, Box<dyn Error>>;
 }
 
 impl InternalTrait<Transformation, Value> for Transformation {
@@ -58,6 +58,22 @@ impl TransformationTrait<Transformation, Value> for Transformation {
                 )
             })?),
             Err(_) => Ok(false),
+        }
+    }
+
+    fn get_opt_map(&self, key: &str, i: usize) -> Result<Option<&Mapping>, Box<dyn Error>> {
+        match self.get_raw_value(key, i) {
+            Ok(raw) => Ok(Some(raw.as_mapping().ok_or_else(
+                || -> Box<dyn Error> {
+                    format!(
+                        "Expected \"{}\" to be a map for ingredient #{}",
+                        key,
+                        i + 1
+                    )
+                    .into()
+                },
+            )?)),
+            Err(_) => Ok(None),
         }
     }
 }

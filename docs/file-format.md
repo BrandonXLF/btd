@@ -18,6 +18,7 @@ Run a command.
 
 * `cmd` - The command to run.
 * `cwd` (*optional*) - The current working directory to run the command in. Defaults to the `meta` transformation's `dir`.
+* `env` (*optional*) - Mapping of environment variables to set.
 
 ### `create`
 
