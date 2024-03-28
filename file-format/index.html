@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.1.1">
 <title data-rh="true">File Format | btd</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://brandonxlf.github.io/btd/file-format"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="File Format | btd"><meta data-rh="true" name="description" content="Instruction Files are YAML files consisting of a list of Transformations. To learn more about the YAML file format, visit yaml.org."><meta data-rh="true" property="og:description" content="Instruction Files are YAML files consisting of a list of Transformations. To learn more about the YAML file format, visit yaml.org."><link data-rh="true" rel="icon" href="/btd/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://brandonxlf.github.io/btd/file-format"><link data-rh="true" rel="alternate" href="https://brandonxlf.github.io/btd/file-format" hreflang="en"><link data-rh="true" rel="alternate" href="https://brandonxlf.github.io/btd/file-format" hreflang="x-default"><link rel="stylesheet" href="/btd/assets/css/styles.e4614597.css">
-<script src="/btd/assets/js/runtime~main.3958b2fd.js" defer="defer"></script>
+<script src="/btd/assets/js/runtime~main.7926c7b6.js" defer="defer"></script>
 <script src="/btd/assets/js/main.95c2c8e1.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -13,15 +13,16 @@
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="transformations">Transformations<a href="#transformations" class="hash-link" aria-label="Direct link to Transformations" title="Direct link to Transformations">​</a></h2>
 <p>Each Transformation is a YAML dictionary with a <code>type</code> key corresponding to one of the options below.</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="meta"><code>meta</code><a href="#meta" class="hash-link" aria-label="Direct link to meta" title="Direct link to meta">​</a></h3>
-<p>The first entry. Contains information about the recipe.</p>
+<p>The first entry. Contains information about the Instruction File.</p>
 <ul>
-<li><code>dir</code> - Base directory to use for commands and file operations.</li>
+<li><code>dir</code> - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="run"><code>run</code><a href="#run" class="hash-link" aria-label="Direct link to run" title="Direct link to run">​</a></h3>
 <p>Run a command.</p>
 <ul>
 <li><code>cmd</code> - The command to run.</li>
 <li><code>cwd</code> (<em>optional</em>) - The current working directory to run the command in. Defaults to the <code>meta</code> transformation&#x27;s <code>dir</code>.</li>
+<li><code>env</code> (<em>optional</em>) - Mapping of environment variables to set.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="create"><code>create</code><a href="#create" class="hash-link" aria-label="Direct link to create" title="Direct link to create">​</a></h3>
 <p>Create a file with content.</p>
