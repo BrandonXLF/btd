@@ -8,7 +8,7 @@ Each Transformation is a YAML dictionary with a `type` key corresponding to one 
 
 ### `meta`
 
-The first entry. Contains information about the recipe.
+The first entry. Contains information about the Instruction File.
 
 * `dir` - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
 

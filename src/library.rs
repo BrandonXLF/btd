@@ -7,7 +7,7 @@ use std::{
 };
 
 use crate::{
-    read::read_recipe_file,
+    read::read_instruction_file,
     transformation::{MetaTransformation, Transformation, TransformationTrait},
 };
 
@@ -45,7 +45,7 @@ impl Library {
         None
     }
 
-    pub fn get_all_recipes(&self) -> Result<impl Iterator<Item = PathBuf>, Box<dyn Error>> {
+    pub fn get_all_files(&self) -> Result<impl Iterator<Item = PathBuf>, Box<dyn Error>> {
         return Ok(read_dir(&self.dir)
             .map_err(|_| "Failed to read the library directory")?
             .filter_map(Result::ok)
@@ -61,14 +61,14 @@ impl Library {
         };
 
         if !path.is_file() {
-            return Err("Recipe not found".into());
+            return Err("Instruction File not found".into());
         }
 
         Ok(path)
     }
-    pub fn list_recipes(&self) -> Result<(), Box<dyn Error>> {
-        for file in self.get_all_recipes()? {
-            if let Ok(steps) = read_recipe_file(&file) {
+    pub fn list_files(&self) -> Result<(), Box<dyn Error>> {
+        for file in self.get_all_files()? {
+            if let Ok(steps) = read_instruction_file(&file) {
                 let meta = steps.get(0).ok_or("Missing meta step")?;
                 let dir = meta.get_req_str("dir", 0)?;
 
@@ -79,11 +79,11 @@ impl Library {
         Ok(())
     }
 
-    pub fn create_recipe(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
+    pub fn create_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let path = if let Some(name) = name {
             self.name_to_path(name)
         } else {
-            print!("\nEnter recipe name: ");
+            print!("\nEnter Instruction File name: ");
             let _ = stdout().flush();
 
             let mut name = String::new();
@@ -111,21 +111,21 @@ impl Library {
         Ok(())
     }
 
-    pub fn delete_recipe(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
+    pub fn delete_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let path = self.get_existing_dir(name)?;
 
-        remove_file(path).map_err(|_| "Failed to remove recipe")?;
+        remove_file(path).map_err(|_| "Failed to remove Instruction File")?;
         Ok(())
     }
 
-    pub fn edit_recipe(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
+    pub fn edit_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let path = self.get_existing_dir(name)?;
 
         edit::edit_file(path)?;
         Ok(())
     }
 
-    pub fn rename_recipe(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
+    pub fn rename_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let old_path = self.get_existing_dir(name)?;
 
         print!("\nEnter new name: ");
@@ -147,8 +147,8 @@ impl Library {
     pub fn match_by_dir(&self) -> Result<(PathBuf, Vec<Transformation>), Box<dyn Error>> {
         let cwd = env::current_dir()?;
 
-        for path in self.get_all_recipes()? {
-            if let Ok(steps) = read_recipe_file(&path) {
+        for path in self.get_all_files()? {
+            if let Ok(steps) = read_instruction_file(&path) {
                 let step = steps.get(0);
                 let meta = step.as_ref().ok_or("Missing meta step")?;
                 let dir = meta.get_req_str("dir", 0)?;
@@ -159,6 +159,6 @@ impl Library {
             }
         }
 
-        return Err("No recipe matches the current directory. Run btd --help for help.".into());
+        return Err("No Instruction Files match the current directory. Run btd --help for help.".into());
     }
 }

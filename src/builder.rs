@@ -9,27 +9,27 @@ use std::{
 use system::{system_output, System};
 
 use crate::{
-    read::read_recipe,
+    read::find_instructions,
     transformation::{Transformation, TransformationTrait},
 };
 
 static STAGES: &[char] = &['🥚', '🐣', '🐤', '🐔'];
 
-pub struct Chef<'a> {
+pub struct Builder<'a> {
     dir: &'a Path,
     stage: usize,
 }
 
-impl Chef<'_> {
-    fn new(dir: &str) -> Chef {
-        Chef {
+impl Builder<'_> {
+    fn new(dir: &str) -> Builder {
+        Builder {
             dir: Path::new(dir),
             stage: 0,
         }
     }
 
-    pub fn process_recipe(name: Option<&str>) -> Result<(), Box<dyn Error>> {
-        let mut steps = read_recipe(name)?;
+    pub fn process_file(name: Option<&str>) -> Result<(), Box<dyn Error>> {
+        let mut steps = find_instructions(name)?;
 
         if steps.len() == 0 {
             return Err("Missing meta step".into());
@@ -37,7 +37,7 @@ impl Chef<'_> {
 
         let meta = steps.remove(0);
         let dir = meta.get_req_str("dir", 0)?;
-        let mut output = Chef::new(&dir);
+        let mut output = Builder::new(&dir);
 
         for (i, step) in steps.iter().enumerate() {
             output.do_step(step, i + 1)?;
@@ -264,7 +264,7 @@ impl Chef<'_> {
                     return Err(format!("Failed to transfer {} to {}", name, to).into());
                 }
             }
-            x => return Err(format!("Unknown type \"{}\" for ingredient #{}", x, i).into()),
+            x => return Err(format!("Unknown type \"{}\" for instruction #{}", x, i).into()),
         }
 
         return Ok(());

@@ -18,7 +18,7 @@ pub trait TransformationTrait<T, V> {
 impl InternalTrait<Transformation, Value> for Transformation {
     fn get_raw_value(&self, key: &str, i: usize) -> Result<&Value, Box<dyn Error>> {
         self.get(key)
-            .ok_or_else(|| format!("Missing key \"{}\" for ingredient #{}", key, i + 1).into())
+            .ok_or_else(|| format!("Missing key \"{}\" for instruction #{}", key, i + 1).into())
     }
 }
 
@@ -27,7 +27,7 @@ impl TransformationTrait<Transformation, Value> for Transformation {
         match self.get_raw_value(key, i) {
             Ok(raw) => Ok(Some(raw.as_str().ok_or_else(|| -> Box<dyn Error> {
                 format!(
-                    "Expected \"{}\" to be a string for ingredient #{}",
+                    "Expected \"{}\" to be a string for instruction #{}",
                     key,
                     i + 1
                 )
@@ -40,7 +40,7 @@ impl TransformationTrait<Transformation, Value> for Transformation {
     fn get_req_str(&self, key: &str, i: usize) -> Result<&str, Box<dyn Error>> {
         self.get_opt_str(key, i)?.ok_or_else(|| {
             format!(
-                "Missing required string \"{}\" for ingredient #{}",
+                "Missing required string \"{}\" for instruction #{}",
                 key,
                 i + 1
             )
@@ -52,7 +52,7 @@ impl TransformationTrait<Transformation, Value> for Transformation {
         match self.get_raw_value(key, i) {
             Ok(raw) => Ok(raw.as_bool().ok_or_else(|| {
                 format!(
-                    "Expected \"{}\" to be a boolean for ingredient #{}",
+                    "Expected \"{}\" to be a boolean for instruction #{}",
                     key,
                     i + 1
                 )
@@ -65,12 +65,7 @@ impl TransformationTrait<Transformation, Value> for Transformation {
         match self.get_raw_value(key, i) {
             Ok(raw) => Ok(Some(raw.as_mapping().ok_or_else(
                 || -> Box<dyn Error> {
-                    format!(
-                        "Expected \"{}\" to be a map for ingredient #{}",
-                        key,
-                        i + 1
-                    )
-                    .into()
+                    format!("Expected \"{}\" to be a map for instruction #{}", key, i + 1).into()
                 },
             )?)),
             Err(_) => Ok(None),
