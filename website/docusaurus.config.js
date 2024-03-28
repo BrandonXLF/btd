@@ -7,6 +7,7 @@ const config = {
     title: 'btd',
     tagline: 'Build. Transform. Deploy.',
     favicon: 'img/favicon.svg',
+    trailingSlash: true,
     url: 'https://brandonxlf.github.io',
     baseUrl: '/btd/',
     organizationName: 'brandonxlf',
