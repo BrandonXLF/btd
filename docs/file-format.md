@@ -10,7 +10,7 @@ Each Transformation is a YAML dictionary with a `type` key corresponding to one 
 
 The first entry. Contains information about the recipe.
 
-* `dir` - Base directory to use for commands and file operations.
+* `dir` - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
 
 ### `run`
 

@@ -90,12 +90,11 @@ impl Chef<'_> {
 
                 let mut rust_cmd = Command::system(&cmd);
 
-                let cwd = step
-                    .get_opt_str("cwd", i)?
-                    .map(Path::new)
-                    .unwrap_or(self.dir);
-
-                rust_cmd.current_dir(cwd);
+                if let Some(cwd) = step.get_opt_str("cwd", i)? {
+                    rust_cmd.current_dir(self.dir.join(cwd));
+                } else {
+                    rust_cmd.current_dir(self.dir);
+                }
 
                 if let Some(envs) = step.get_opt_map("env", i)? {
                     for (name, val) in envs.iter() {
