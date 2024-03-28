@@ -48,13 +48,13 @@ impl Chef<'_> {
     }
 
     fn show_status(&mut self, step_type: &str, param: &str) {
-        let ingredient = STAGES[self.stage];
+        let emoji = STAGES[self.stage];
 
         self.stage = (self.stage + 1) % STAGES.len();
 
         println!(
             "\n{} \x1b[38;5;39m{}\x1b[0m \x1b[38;5;248m{}\x1b[0m",
-            ingredient, step_type, param
+            emoji, step_type, param
         );
     }
 
@@ -264,7 +264,7 @@ impl Chef<'_> {
                     return Err(format!("Failed to transfer {} to {}", name, to).into());
                 }
             }
-            _ => {}
+            x => return Err(format!("Unknown type \"{}\" for ingredient #{}", x, i).into()),
         }
 
         return Ok(());
