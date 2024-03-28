@@ -60,7 +60,7 @@ const config = {
         },
         footer: {
             style: 'dark',
-            copyright: `Copyright © ${new Date().getFullYear()} Brandon Fowler`,
+            copyright: `Copyright © ${new Date().getFullYear()} <a href="https://www.brandonfowler.me/">Brandon Fowler</a>`,
         },
         prism: {
             theme: prismThemes.github,

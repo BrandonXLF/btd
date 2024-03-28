@@ -10,10 +10,12 @@
     --color-primary-900: #216094;
 
     --ifm-color-primary: var(--color-primary-600);
-    --ifm-link-color: var(--color-primary-600);
+}
+
+.footer {
+    --ifm-link-color: var(--color-primary-300);
 }
 
 [data-theme='dark'] {
-    --ifm-color-primary: var(--color-primary-500);
-    --ifm-link-color: var(--color-primary-300);
+    --ifm-color-primary: var(--color-primary-400);
 }
