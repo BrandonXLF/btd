@@ -30,24 +30,24 @@ Create a file with content.
 
 Find and replace text in a file.
 
-* `file` - The file to operate on.
-* `find` - The text to find.
-* `replace` - The text to replace.
-* `regex` - Boolean indicating of `find` should be interpreted as a regex expression.
+* `file` - The file to replace text in.
+* `find` - The text to find. Interpreted as normal text unless `regex` is `true`.
+* `replace` - The text to replace. If `regex` is `true`, substitutions (eg. `$1`, `$2`, etc.) are supported.
+* `regex` (*optional*) - Boolean indicating if `find` should be interpreted as a regex expression. Defaults to `false`.
 
 ### `prepend`
 
 Find and replace text in a file.
 
-* `file` - The file to create.
-* `text` - Text to create the file with.
+* `file` - The file to prepend text to.
+* `text` - Text to prepend the file with.
 
 ### `append`
 
 Append text to the end of a file.
 
-* `file` - The file to create.
-* `text` - Text to create the file with.
+* `file` - The file to append to text.
+* `text` - Text to append the file with.
 
 ### `rename`
 
@@ -75,4 +75,4 @@ Deploy a file to a production environment via secure copy.
 
 * `from` - The local directory/file to copy from.
 * `to` - The production directory/file to copy to as an `scp` path.
-* `clear` - Boolean indicating of `to` should be removed first.
+* `clear` (*optional*) - Boolean indicating of `to` should be removed first. Defaults to `false`.
