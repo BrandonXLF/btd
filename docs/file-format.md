@@ -65,9 +65,10 @@ Copy a file.
 
 ### `delete`
 
-Delete a file.
+Delete a file or directory.
 
-* `file` - The file to delete.
+* `file` - The file or directory to delete.
+* `recursive` (*optional*) - Boolean indicating if items should be deleted recursively if `file` is a directory.
 
 ### `deploy`
 

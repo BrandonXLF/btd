@@ -182,7 +182,22 @@ impl Chef<'_> {
             }
             "delete" => {
                 let name = step.get_req_str("file", i)?;
-                fs::remove_file(name).map_err(|_| "Unable to delete file")?;
+                let recursive = step.get_opt_in_bool("recursive", i)?;
+                let path = Path::new(name);
+
+                if !path.is_dir() {
+                    fs::remove_file(name).map_err(|_| "Unable to delete file")?;
+                } else if recursive {
+                    fs::remove_dir_all(path).map_err(|_| "Unable to recursively delete directory")?;
+                } else {
+                    if let Ok(mut contents) = path.read_dir() {
+                        if contents.next().is_some() {
+                            return Err("Directory is not empty".into());
+                        }
+                    }
+
+                    fs::remove_dir(path).map_err(|_| "Unable to delete directory")?;
+                }
             }
             "deploy" => {
                 let name = step.get_req_str("from", i)?;
