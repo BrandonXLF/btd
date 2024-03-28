@@ -17,6 +17,7 @@ The first entry. Contains information about the recipe.
 Run a command.
 
 * `cmd` - The command to run.
+* `cwd` (*optional*) - The current working directory to run the command in. Defaults to the `meta` transformation's `dir`.
 
 ### `create`
 

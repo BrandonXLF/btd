@@ -88,8 +88,13 @@ impl Chef<'_> {
                 let cmd = step.get_req_str("cmd", i)?;
                 self.show_status(&step_type, &cmd);
 
+                let cwd = step
+                    .get_opt_str("cwd", i)?
+                    .map(Path::new)
+                    .unwrap_or(self.dir);
+
                 let success = Command::system(&cmd)
-                    .current_dir(self.dir)
+                    .current_dir(cwd)
                     .status()
                     .map_err(|_| format!("Failed to run command {}", cmd))?
                     .success();
@@ -118,7 +123,7 @@ impl Chef<'_> {
                 let raw_str = step.get_req_str("find", i)?;
                 let escaped_str: String;
 
-                let pattern_str = if step.get_opt_bool("regex", i)? {
+                let pattern_str = if step.get_opt_in_bool("regex", i)? {
                     raw_str
                 } else {
                     escaped_str = regex::escape(&raw_str);
@@ -189,7 +194,7 @@ impl Chef<'_> {
                 let to = step.get_req_str("to", i)?;
                 let (host, to_path) = Self::parse_scp_path(&to);
 
-                if step.get_opt_bool("clear", i)? {
+                if step.get_opt_in_bool("clear", i)? {
                     let output = Self::run_remote_command(
                         host,
                         &format!(

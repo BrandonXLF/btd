@@ -6,22 +6,41 @@ use serde_yaml::{Mapping, Value};
 pub type Transformation = Mapping;
 
 pub trait TransformationTrait<T, V> {
-    fn get_raw_value(&self, key: &str, i: usize) -> Result<&V, Box<dyn Error>>;
+    fn get_opt_str(&self, key: &str, i: usize) -> Result<Option<&str>, Box<dyn Error>>;
     fn get_req_str(&self, key: &str, i: usize) -> Result<&str, Box<dyn Error>>;
-    fn get_opt_bool(&self, key: &str, i: usize) -> Result<bool, Box<dyn Error>>;
+    fn get_opt_in_bool(&self, key: &str, i: usize) -> Result<bool, Box<dyn Error>>;
 }
 
-impl TransformationTrait<Transformation, Value> for Transformation {
+trait InternalTrait<T, V> {
+    fn get_raw_value(&self, key: &str, i: usize) -> Result<&V, Box<dyn Error>>;
+}
+
+impl InternalTrait<Transformation, Value> for Transformation {
     fn get_raw_value(&self, key: &str, i: usize) -> Result<&Value, Box<dyn Error>> {
         self.get(key)
             .ok_or_else(|| format!("Missing key \"{}\" for ingredient #{}", key, i + 1).into())
     }
+}
+
+impl TransformationTrait<Transformation, Value> for Transformation {
+    fn get_opt_str(&self, key: &str, i: usize) -> Result<Option<&str>, Box<dyn Error>> {
+        match self.get_raw_value(key, i) {
+            Ok(raw) => Ok(Some(raw.as_str().ok_or_else(|| -> Box<dyn Error> {
+                format!(
+                    "Expected \"{}\" to be a string for ingredient #{}",
+                    key,
+                    i + 1
+                )
+                .into()
+            })?)),
+            Err(_) => Ok(None),
+        }
+    }
 
     fn get_req_str(&self, key: &str, i: usize) -> Result<&str, Box<dyn Error>> {
-        let raw = self.get_raw_value(key, i)?;
-        raw.as_str().ok_or_else(|| {
+        self.get_opt_str(key, i)?.ok_or_else(|| {
             format!(
-                "Expected \"{}\" to be a string for ingredient #{}",
+                "Missing required string \"{}\" for ingredient #{}",
                 key,
                 i + 1
             )
@@ -29,7 +48,7 @@ impl TransformationTrait<Transformation, Value> for Transformation {
         })
     }
 
-    fn get_opt_bool(&self, key: &str, i: usize) -> Result<bool, Box<dyn Error>> {
+    fn get_opt_in_bool(&self, key: &str, i: usize) -> Result<bool, Box<dyn Error>> {
         match self.get_raw_value(key, i) {
             Ok(raw) => Ok(raw.as_bool().ok_or_else(|| {
                 format!(
