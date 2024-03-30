@@ -53,7 +53,7 @@ const config = {
                 },
                 {
                     href: 'https://crates.io/crates/btd',
-                    label: 'creates.io',
+                    label: 'crates.io',
                     position: 'right',
                 },
                 {
