@@ -11,3 +11,6 @@ regex = "1.10.3"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9.33"
 system = "0.3.0"
+
+[build-dependencies]
+winres = "0.1.12"

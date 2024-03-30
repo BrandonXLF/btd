@@ -4,6 +4,7 @@
 const sidebars = {
     docSidebar: [
         'index',
+        'install',
         'file-format',
         'running',
         'the-library',
