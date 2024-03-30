@@ -52,6 +52,11 @@ const config = {
                     label: 'Docs',
                 },
                 {
+                    href: 'https://crates.io/crates/btd',
+                    label: 'creates.io',
+                    position: 'right',
+                },
+                {
                     href: 'https://github.com/brandonxlf/btd',
                     label: 'GitHub',
                     position: 'right',
