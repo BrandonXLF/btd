@@ -236,7 +236,7 @@ impl Builder<'_> {
                     )?;
 
                     let stdout = String::from_utf8_lossy(&output.stdout);
-                    let type_str = if from_is_dir { "directory" } else { "file " };
+                    let type_str = if from_is_dir { "directory" } else { "file" };
 
                     if stdout.trim_end() == "OK" {
                         println!("\nRemoved {} {}", type_str, to);
