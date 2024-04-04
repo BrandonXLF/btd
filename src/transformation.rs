@@ -65,7 +65,12 @@ impl TransformationTrait<Transformation, Value> for Transformation {
         match self.get_raw_value(key, i) {
             Ok(raw) => Ok(Some(raw.as_mapping().ok_or_else(
                 || -> Box<dyn Error> {
-                    format!("Expected \"{}\" to be a map for instruction #{}", key, i + 1).into()
+                    format!(
+                        "Expected \"{}\" to be a map for instruction #{}",
+                        key,
+                        i + 1
+                    )
+                    .into()
                 },
             )?)),
             Err(_) => Ok(None),

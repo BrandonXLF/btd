@@ -159,6 +159,8 @@ impl Library {
             }
         }
 
-        return Err("No Instruction Files match the current directory. Run btd --help for help.".into());
+        return Err(
+            "No Instruction Files match the current directory. Run btd --help for help.".into(),
+        );
     }
 }

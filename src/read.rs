@@ -32,11 +32,15 @@ fn resolve_name_or_path(name_or_path: &str) -> Result<PathBuf, Box<dyn Error>> {
     } else if let Some(path) = Library::new()?.resolve_name(name_or_path) {
         Ok(path)
     } else {
-        return Err("No Instruction File found. Run btd --list to see available Instruction Files.".into());
+        return Err(
+            "No Instruction File found. Run btd --list to see available Instruction Files.".into(),
+        );
     }
 }
 
-pub fn find_instructions(name_or_path: Option<&str>) -> Result<Vec<Transformation>, Box<dyn Error>> {
+pub fn find_instructions(
+    name_or_path: Option<&str>,
+) -> Result<Vec<Transformation>, Box<dyn Error>> {
     if let Some(name_or_path) = name_or_path {
         let path = resolve_name_or_path(name_or_path)?;
         read_instruction_file(&path)
