@@ -77,4 +77,4 @@ Deploy a file to a production environment via secure copy.
 
 * `from` - The local directory/file to copy from.
 * `to` - The production directory/file to copy to as an `scp` path.
-* `clear` (*optional*) - Boolean indicating of `to` should be removed first. Defaults to `false`.
+* `clear` (*optional*) - Boolean indicating if `to` should be removed and replaced with `from`. Files are transferred to the remote server before `to` is deleted. Defaults to `false`. 

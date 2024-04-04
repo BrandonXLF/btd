@@ -2,8 +2,9 @@ use std::{
     error::Error,
     fs,
     io::Write,
-    path::Path,
-    process::{Command, Output},
+    path::{Path, PathBuf},
+    process::Command,
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 use system::{system_output, System};
@@ -71,13 +72,38 @@ impl Builder<'_> {
         }
     }
 
-    fn run_remote_command(host: Option<&str>, cmd: &str) -> Result<Output, Box<dyn Error>> {
-        let out_result = match host {
-            Some(host) => Command::new("ssh").args(&["-tq", host, cmd]).output(),
+    fn run_remote_command(host: Option<&str>, cmd: &str) -> Result<Option<()>, Box<dyn Error>> {
+        let output = match host {
+            Some(host) => Command::new("ssh")
+                .args(&["-tq", host, &format!("({}) && echo OK", cmd)])
+                .output(),
             None => system_output(cmd),
-        };
+        }
+        .map_err(|_| "Failed to execute pre-deployment command")?;
 
-        Ok(out_result.map_err(|_| "Failed to execute pre-deployment command")?)
+        let stdout = String::from_utf8_lossy(&output.stdout);
+
+        if stdout.trim_end() == "OK" {
+            Ok(Some(()))
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn deploy_scp(from: PathBuf, to: &str, display_from: &str) -> Result<(), Box<dyn Error>> {
+        println!();
+
+        let success = Command::new("scp")
+            .args(&["-r", &from.to_string_lossy(), &to])
+            .status()
+            .map_err(|_| "Failed to execute scp")?
+            .success();
+
+        if !success {
+            return Err(format!("Failed to transfer {} to {}", display_from, to).into());
+        }
+
+        return Ok(());
     }
 
     fn do_step(&mut self, step: &Transformation, i: usize) -> Result<(), Box<dyn Error>> {
@@ -227,41 +253,72 @@ impl Builder<'_> {
                 let (host, to_path) = Self::parse_scp_path(&to);
 
                 if step.get_opt_in_bool("clear", i)? {
-                    let output = Self::run_remote_command(
+                    let type_str = if from_is_dir { "directory" } else { "file" };
+                    let date_str = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)?
+                        .as_millis()
+                        .to_string();
+                    let temp_to = to.to_owned() + "-" + &date_str;
+                    let temp_to_path = to_path.to_owned() + "-" + &date_str;
+
+                    Self::deploy_scp(from, &temp_to, name)?;
+
+                    let temp_result = (|| -> Result<(), Box<dyn Error>> {
+                        if Self::run_remote_command(
+                            host,
+                            &format!("rm -rf \"{}\" || del /f /q \"{}\"", to_path, to_path),
+                        )?
+                        .is_none()
+                        {
+                            println!("\nCould not remove old deployment {}", to_path)
+                        } else {
+                            println!("\nRemoved old deployment {}", to_path)
+                        }
+
+                        Self::run_remote_command(
+                            host,
+                            &format!("scp -r \"{}\" \"{}\"", temp_to_path, to_path),
+                        )?
+                        .ok_or_else(|| {
+                            format!(
+                                "Failed to move temporary {} {} to {}",
+                                type_str, temp_to_path, to_path
+                            )
+                        })?;
+
+                        Ok(())
+                    })();
+
+                    let cleanup_result = Self::run_remote_command(
                         host,
                         &format!(
-                            "(rm -rf \"{}\" && echo OK) || (del /f /q \"{}\" && echo OK)",
-                            to_path, to_path
+                            "rm -rf \"{}\" || del /f /q \"{}\"",
+                            temp_to_path, temp_to_path
                         ),
                     )?;
 
-                    let stdout = String::from_utf8_lossy(&output.stdout);
-                    let type_str = if from_is_dir { "directory" } else { "file" };
+                    match cleanup_result {
+                        Some(..) => temp_result?,
+                        None => {
+                            if let Err(err) = temp_result {
+                                eprintln!("\n{}", err);
+                            }
 
-                    if stdout.trim_end() == "OK" {
-                        println!("\nRemoved {} {}", type_str, to);
-                    } else {
-                        return Err(
-                            format!("Failed to remove {} before deployment", type_str).into()
-                        );
+                            return Err(format!(
+                                "Failed to remove temporary {} {}",
+                                type_str, temp_to_path
+                            )
+                            .into());
+                        }
                     }
-                }
+                } else {
+                    // Prevent creation of another directory inside existing directory
+                    if from_is_dir {
+                        Self::run_remote_command(host, &format!("mkdir \"{}\"", to_path))?;
+                        from = from.join("*");
+                    }
 
-                if from_is_dir {
-                    Self::run_remote_command(host, &format!("mkdir \"{}\"", to_path))?;
-                    from = from.join("*");
-                }
-
-                println!();
-
-                let success = Command::new("scp")
-                    .args(&["-r", &from.to_string_lossy(), &to])
-                    .status()
-                    .map_err(|_| "Failed to execute scp")?
-                    .success();
-
-                if !success {
-                    return Err(format!("Failed to transfer {} to {}", name, to).into());
+                    Self::deploy_scp(from, to, name)?;
                 }
             }
             x => return Err(format!("Unknown type \"{}\" for instruction #{}", x, i).into()),
