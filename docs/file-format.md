@@ -10,71 +10,71 @@ Each Transformation is a YAML dictionary with a `type` key corresponding to one 
 
 The first entry. Contains information about the Instruction File.
 
-* `dir` - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
+* `dir` string - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
 
 ### `run`
 
 Run a command.
 
-* `cmd` - The command to run.
-* `cwd` (*optional*) - The current working directory to run the command in. Defaults to the `meta` transformation's `dir`.
-* `env` (*optional*) - Mapping of environment variables to set.
+* `cmd` string - The command to run.
+* `cwd` (*optional*) string - The current working directory to run the command in. Defaults to the `meta` transformation's `dir`.
+* `env` (*optional*) string - Mapping of environment variables to set.
 
 ### `create`
 
 Create a file with content.
 
-* `file` - The file to create.
-* `text` - Text to create the file with.
+* `file` string - The file to create.
+* `text` string - Text to create the file with.
 
 ### `replace`
 
 Find and replace text in a file.
 
-* `file` - The file to replace text in.
-* `find` - The text to find. Interpreted as normal text unless `regex` is `true`.
-* `replace` - The text to replace. If `regex` is `true`, substitutions (eg. `$1`, `$2`, etc.) are supported.
-* `regex` (*optional*) - Boolean indicating if `find` should be interpreted as a regex expression. Defaults to `false`.
+* `file` string - The file to replace text in.
+* `find` string - The text to find. Interpreted as normal text unless `regex` is `true`.
+* `replace` string - The text to replace. If `regex` is `true`, substitutions (eg. `$1`, `$2`, etc.) are supported.
+* `regex` (*optional*) boolean - Interpret `find` as a regular expression. Default is `false`.
 
 ### `prepend`
 
 Find and replace text in a file.
 
-* `file` - The file to prepend text to.
-* `text` - Text to prepend the file with.
+* `file` string - The file to prepend text to.
+* `text` string - Text to prepend the file with.
 
 ### `append`
 
 Append text to the end of a file.
 
-* `file` - The file to append to text.
-* `text` - Text to append the file with.
+* `file` string - The file to append to text.
+* `text` string - Text to append the file with.
 
 ### `rename`
 
 Rename a file.
 
-* `from` - The old file path.
-* `to` - The new file path.
+* `from` string - The old file path.
+* `to` string - The new file path.
 
 ### `copy`
 
 Copy a file.
 
-* `from` - The path of the original file.
-* `to` - The path of the copy to create.
+* `from` string - The path of the original file.
+* `to` string - The path of the copy to create.
 
 ### `delete`
 
 Delete a file or directory.
 
-* `file` - The file or directory to delete.
-* `recursive` (*optional*) - Boolean indicating if items should be deleted recursively if `file` is a directory.
+* `file` string - The file or directory to delete.
+* `recursive` (*optional*) boolean - Delete items recursively if `file` is a directory. Default is `false`.
 
 ### `deploy`
 
 Deploy a file to a production environment via secure copy.
 
-* `from` - The local directory/file to copy from.
-* `to` - The production directory/file to copy to as an `scp` path.
-* `clear` (*optional*) - Boolean indicating if `to` should be removed and replaced with `from`. Files are transferred to the remote server before `to` is deleted. Defaults to `false`. 
+* `from` string - The local directory/file to copy from.
+* `to` string - The production directory/file to copy to as an `scp` path.
+* `clear` (*optional*) boolean - Remove `to` before replacing it with `from`. Useful for directories. Files are transferred to the remote server before `to` is removed. Default is `false`.
