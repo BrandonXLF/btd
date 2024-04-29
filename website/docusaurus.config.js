@@ -13,6 +13,7 @@ const config = {
     projectName: 'btd',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'throw',
+    trailingSlash: true,
     i18n: {
         defaultLocale: 'en',
         locales: ['en'],
