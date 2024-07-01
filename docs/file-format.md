@@ -52,14 +52,14 @@ Append text to the end of a file.
 
 ### `rename`
 
-Rename a file.
+Rename a file or directory.
 
 * `from` string - The old file path.
 * `to` string - The new file path.
 
 ### `copy`
 
-Copy a file.
+Copy a file. To copy a directory, use `scp`.
 
 * `from` string - The path of the original file.
 * `to` string - The path of the copy to create.
@@ -73,7 +73,7 @@ Delete a file or directory.
 
 ### `deploy`
 
-Deploy a file to a production environment via secure copy.
+Deploy a file or directory to a production environment via secure copy.
 
 * `from` string - The local directory/file to copy from.
 * `to` string - The production directory/file to copy to as an `scp` path.
