@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.2.1">
 <title data-rh="true">File Format | btd</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://brandonxlf.github.io/btd/file-format/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="File Format | btd"><meta data-rh="true" name="description" content="Instruction Files are YAML files consisting of a list of Transformations. To learn more about the YAML file format, visit yaml.org."><meta data-rh="true" property="og:description" content="Instruction Files are YAML files consisting of a list of Transformations. To learn more about the YAML file format, visit yaml.org."><link data-rh="true" rel="icon" href="/btd/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://brandonxlf.github.io/btd/file-format/"><link data-rh="true" rel="alternate" href="https://brandonxlf.github.io/btd/file-format/" hreflang="en"><link data-rh="true" rel="alternate" href="https://brandonxlf.github.io/btd/file-format/" hreflang="x-default"><link rel="stylesheet" href="/btd/assets/css/styles.aafcca10.css">
-<script src="/btd/assets/js/runtime~main.6e35b459.js" defer="defer"></script>
+<script src="/btd/assets/js/runtime~main.199c97b0.js" defer="defer"></script>
 <script src="/btd/assets/js/main.7745c589.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -51,13 +51,13 @@
 <li><code>text</code> string - Text to append the file with.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="rename"><code>rename</code><a href="#rename" class="hash-link" aria-label="Direct link to rename" title="Direct link to rename">​</a></h3>
-<p>Rename a file.</p>
+<p>Rename a file or directory.</p>
 <ul>
 <li><code>from</code> string - The old file path.</li>
 <li><code>to</code> string - The new file path.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="copy"><code>copy</code><a href="#copy" class="hash-link" aria-label="Direct link to copy" title="Direct link to copy">​</a></h3>
-<p>Copy a file.</p>
+<p>Copy a file. To copy a directory, use <code>scp</code>.</p>
 <ul>
 <li><code>from</code> string - The path of the original file.</li>
 <li><code>to</code> string - The path of the copy to create.</li>
@@ -69,7 +69,7 @@
 <li><code>recursive</code> (<em>optional</em>) boolean - Delete items recursively if <code>file</code> is a directory. Default is <code>false</code>.</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="deploy"><code>deploy</code><a href="#deploy" class="hash-link" aria-label="Direct link to deploy" title="Direct link to deploy">​</a></h3>
-<p>Deploy a file to a production environment via secure copy.</p>
+<p>Deploy a file or directory to a production environment via secure copy.</p>
 <ul>
 <li><code>from</code> string - The local directory/file to copy from.</li>
 <li><code>to</code> string - The production directory/file to copy to as an <code>scp</code> path.</li>
