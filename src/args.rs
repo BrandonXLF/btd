@@ -47,6 +47,7 @@ impl Args {
             "--list" => self.get_lib()?.list_files(),
             "--open" => self.get_lib()?.open(),
             "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
+            "--set-lib" => self.get_lib()?.write_link(self.get_unnamed()),
             "--help" => show_help(),
             "--version" => show_version(),
             _ => Builder::process_file(Some(&self.other_args[1]), &self),
@@ -80,9 +81,12 @@ The Library
     --rename [<name>]   Rename the Instruction File in The Library with the given name. If no name is
                         given, the Instruction File corresponding to the current directory will be
                         renamed.
+    --set-lib           Set the directory to use as the library location. You can access the default
+                        library using \"--lib base\".
 
 Library Options
-    --lib [<lib>]   Read instruction files from the library located in the <lib> directory.
+    --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass <lib>
+                    as base to use the default library location.
 
 Program Information
     --help          Show this help message and exit.
