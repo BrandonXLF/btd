@@ -3,7 +3,7 @@ use std::{
     error::Error,
     fs::{self, read_dir, remove_file, rename, File},
     io::{stdin, stdout, Write},
-    path::PathBuf,
+    path::PathBuf, str::FromStr,
 };
 
 use crate::{
@@ -16,13 +16,19 @@ pub struct Library {
 }
 
 impl Library {
-    pub fn new() -> Result<Library, Box<dyn Error>> {
-        let mut dir = dirs::data_dir().ok_or_else(|| "Failed to get config directory")?;
-        dir.push("btd-library");
-
+    pub fn new(path_str: Option<&str>) -> Result<Library, Box<dyn Error>> {
+        let mut dir = match path_str {
+            Some(path) =>  PathBuf::from_str(path).map_err(|_| "Invalid library path")?,
+            None => {
+                let mut dir = dirs::data_dir().ok_or_else(|| "Failed to get config directory")?;
+                dir.push("btd-library");
+                dir
+            }
+        };
+        
         fs::create_dir_all(&dir).map_err(|_| "Could not make library directory")?;
 
-        return Ok(Library { dir });
+        return Ok(Library{ dir });
     }
 
     fn name_to_path(&self, name: &str) -> PathBuf {

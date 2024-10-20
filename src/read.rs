@@ -1,6 +1,6 @@
 use std::{error::Error, fs::File, path::PathBuf};
 
-use crate::{library::Library, transformation::Transformation};
+use crate::{args::Args, transformation::Transformation};
 
 pub fn read_instruction_file(name: &PathBuf) -> Result<Vec<Transformation>, Box<dyn Error>> {
     let reader = File::open(name)?;
@@ -26,10 +26,10 @@ fn resolve_path(path: &str) -> Option<PathBuf> {
     None
 }
 
-fn resolve_name_or_path(name_or_path: &str) -> Result<PathBuf, Box<dyn Error>> {
+fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<PathBuf, Box<dyn Error>> {
     if let Some(path) = resolve_path(name_or_path) {
         Ok(path)
-    } else if let Some(path) = Library::new()?.resolve_name(name_or_path) {
+    } else if let Some(path) = args.get_lib()?.resolve_name(name_or_path) {
         Ok(path)
     } else {
         return Err(
@@ -40,11 +40,12 @@ fn resolve_name_or_path(name_or_path: &str) -> Result<PathBuf, Box<dyn Error>> {
 
 pub fn find_instructions(
     name_or_path: Option<&str>,
+    args: &Args
 ) -> Result<Vec<Transformation>, Box<dyn Error>> {
     if let Some(name_or_path) = name_or_path {
-        let path = resolve_name_or_path(name_or_path)?;
+        let path = resolve_name_or_path(name_or_path, args)?;
         read_instruction_file(&path)
     } else {
-        Ok(Library::new()?.match_by_dir()?.1)
+        Ok(args.get_lib()?.match_by_dir()?.1)
     }
 }

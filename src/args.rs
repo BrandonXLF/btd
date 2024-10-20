@@ -2,27 +2,61 @@ use std::{env, error::Error};
 
 use crate::{builder::Builder, library::Library};
 
-pub fn process_args(args: Vec<String>) -> Result<(), Box<dyn Error>> {
-    if args.len() <= 1 {
-        return Builder::process_file(None);
+pub struct Args {
+    lib_path: Option<String>,
+    other_args: Vec<String>
+}
+
+impl Args {
+    pub fn new() -> Args {
+        let mut other_args: Vec<String> = Vec::new();
+        let mut next_lib_path = false;
+        let mut lib_path = None;
+
+        for arg in env::args() {
+            if next_lib_path {
+                lib_path = Some(arg);
+                next_lib_path = false;
+            } else if arg == "--lib" {
+                next_lib_path = true;
+            } else {
+                other_args.push(arg);
+            }
+        }
+
+        return Args{ lib_path, other_args };
     }
 
-    match args[1].as_str() {
-        "--create" => Library::new()?.create_file(args.get(2).map(|x| x.as_str())),
-        "--delete" => Library::new()?.delete_file(args.get(2).map(|x| x.as_str())),
-        "--edit" => Library::new()?.edit_file(args.get(2).map(|x| x.as_str())),
-        "--list" => Library::new()?.list_files(),
-        "--open" => Library::new()?.open(),
-        "--rename" => Library::new()?.rename_file(args.get(2).map(|x| x.as_str())),
-        "--help" => show_help(),
-        "--version" => show_version(),
-        _ => Builder::process_file(Some(&args[1])),
+    pub fn get_lib(&self) -> Result<Library, Box<dyn Error>> {
+        Library::new(self.lib_path.as_deref())
+    }
+
+    fn get_unnamed(&self) -> Option<&str> {
+        self.other_args.get(2).map(|x| x.as_str())
+    }
+
+    pub fn process(&self) -> Result<(), Box<dyn Error>> {
+        if self.other_args.len() <= 1 {
+            return Builder::process_file(None, &self);
+        }
+
+        match self.other_args[1].as_str() {
+            "--create" => self.get_lib()?.create_file(self.get_unnamed()),
+            "--delete" => self.get_lib()?.delete_file(self.get_unnamed()),
+            "--edit" => self.get_lib()?.edit_file(self.get_unnamed()),
+            "--list" => self.get_lib()?.list_files(),
+            "--open" => self.get_lib()?.open(),
+            "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
+            "--help" => show_help(),
+            "--version" => show_version(),
+            _ => Builder::process_file(Some(&self.other_args[1]), &self),
+        }
     }
 }
 
 pub fn show_help() -> Result<(), Box<dyn Error>> {
     println!("Usage: btd [<name>]
-       btd <--create | --delete | --edit | --rename> [<name>]
+       btd <--create | --delete | --edit | --rename> [<name>] [--lib <lib>]
        btd <--list | --open>
        btd <--help | --version>
 
@@ -46,6 +80,9 @@ The Library
     --rename [<name>]   Rename the Instruction File in The Library with the given name. If no name is
                         given, the Instruction File corresponding to the current directory will be
                         renamed.
+
+Library Options
+    --lib [<lib>]   Read instruction files from the library located in the <lib> directory.
 
 Program Information
     --help          Show this help message and exit.

@@ -10,15 +10,14 @@ use std::{
 use system::{system_output, System};
 
 use crate::{
-    read::find_instructions,
-    transformation::{Transformation, TransformationTrait},
+    args::Args, read::find_instructions, transformation::{Transformation, TransformationTrait}
 };
 
 static STAGES: &[char] = &['🥚', '🐣', '🐤', '🐔'];
 
 pub struct Builder<'a> {
     dir: &'a Path,
-    stage: usize,
+    stage: usize
 }
 
 impl Builder<'_> {
@@ -29,8 +28,8 @@ impl Builder<'_> {
         }
     }
 
-    pub fn process_file(name: Option<&str>) -> Result<(), Box<dyn Error>> {
-        let mut steps = find_instructions(name)?;
+    pub fn process_file(name: Option<&str>, args: &Args) -> Result<(), Box<dyn Error>> {
+        let mut steps = find_instructions(name, args)?;
 
         if steps.len() == 0 {
             return Err("Missing meta step".into());

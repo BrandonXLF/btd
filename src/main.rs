@@ -4,13 +4,13 @@ mod library;
 mod read;
 mod transformation;
 
-use std::{env, process::exit};
+use std::process::exit;
 
-use args::process_args;
+use args::Args;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let res = process_args(args);
+    let args = Args::new();
+    let res = args.process();
 
     match res {
         Ok(_) => {}
