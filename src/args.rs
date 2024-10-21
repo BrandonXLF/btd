@@ -1,34 +1,44 @@
-use std::{env, error::Error};
+use std::{env, error::Error, path::PathBuf};
 
 use crate::{builder::Builder, library::Library};
 
 pub struct Args {
-    lib_path: Option<String>,
-    other_args: Vec<String>
+    pub lib: Option<String>,
+    pub base_path: Option<PathBuf>,
+    pub other_args: Vec<String>
 }
 
 impl Args {
     pub fn new() -> Args {
+        let mut next_lib = false;
+        let mut lib = None;
+
+        let mut next_base_path = false;
+        let mut base_path = None;
+
         let mut other_args: Vec<String> = Vec::new();
-        let mut next_lib_path = false;
-        let mut lib_path = None;
 
         for arg in env::args() {
-            if next_lib_path {
-                lib_path = Some(arg);
-                next_lib_path = false;
+            if next_lib {
+                lib = Some(arg);
+                next_lib = false;
+            } else if next_base_path {
+                base_path = Some(PathBuf::from(arg));
+                next_base_path = false;
             } else if arg == "--lib" {
-                next_lib_path = true;
+                next_lib = true;
+            } else if arg == "--base" {
+                next_base_path = true;
             } else {
                 other_args.push(arg);
             }
         }
 
-        return Args{ lib_path, other_args };
+        return Args{ lib, base_path, other_args };
     }
 
     pub fn get_lib(&self) -> Result<Library, Box<dyn Error>> {
-        Library::new(self.lib_path.as_deref())
+        Library::new(self.lib.as_deref())
     }
 
     fn get_unnamed(&self) -> Option<&str> {
@@ -44,7 +54,7 @@ impl Args {
             "--create" => self.get_lib()?.create_file(self.get_unnamed()),
             "--delete" => self.get_lib()?.delete_file(self.get_unnamed()),
             "--edit" => self.get_lib()?.edit_file(self.get_unnamed()),
-            "--list" => self.get_lib()?.list_files(),
+            "--list" => self.get_lib()?.list_files(self.base_path.as_deref()),
             "--open" => self.get_lib()?.open(),
             "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
             "--set-lib" => self.get_lib()?.write_link(self.get_unnamed()),
@@ -87,6 +97,8 @@ The Library
 Library Options
     --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass <lib>
                     as base to use the default library location.
+    --base [<base>] Base directory for the meta directory of Instruction Files. Default to the current
+                    working directory.
 
 Program Information
     --help          Show this help message and exit.

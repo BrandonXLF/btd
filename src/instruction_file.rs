@@ -1,4 +1,4 @@
-use std::{error::Error, fs::File, path::PathBuf};
+use std::{error::Error, fs::File, path::{Path, PathBuf}};
 
 use crate::{args::Args, transformation::{Transformation, TransformationTrait}};
 
@@ -7,7 +7,7 @@ pub struct InstructionFile {
     pub steps: Vec<Transformation>
 }
 
-pub fn read(path: &PathBuf) -> Result<InstructionFile, Box<dyn Error>> {
+pub fn read(path: &Path, base: Option<&Path>) -> Result<InstructionFile, Box<dyn Error>> {
     let reader = File::open(path)?;
     let mut steps: Vec<Transformation> = serde_yaml::from_reader(reader)?;
 
@@ -16,7 +16,13 @@ pub fn read(path: &PathBuf) -> Result<InstructionFile, Box<dyn Error>> {
     }
     
     let meta = steps.remove(0);
-    let dir = PathBuf::from(meta.get_req_str("dir", 0)?);
+    let mut dir = PathBuf::from(meta.get_req_str("dir", 0)?);
+
+    if let Some(base) = base {
+        if !dir.is_absolute() {
+            dir = base.join(dir);
+        }
+    }
     
     return Ok(InstructionFile { dir, steps });
 }
@@ -54,8 +60,8 @@ fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<PathBuf, Box<
 pub fn find(name_or_path: Option<&str>, args: &Args) -> Result<InstructionFile, Box<dyn Error>> {
     if let Some(name_or_path) = name_or_path {
         let path = resolve_name_or_path(name_or_path, args)?;
-        read(&path)
+        read(&path, args.base_path.as_deref())
     } else {
-        Ok(args.get_lib()?.match_cwd()?.1)
+        Ok(args.get_lib()?.match_cwd(args.base_path.as_deref())?.1)
     }
 }

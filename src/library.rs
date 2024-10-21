@@ -3,7 +3,7 @@ use std::{
     error::Error,
     fs::{self, read_dir, remove_file, rename, File},
     io::{stdin, stdout, Write},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use crate::{
@@ -98,7 +98,8 @@ impl Library {
         let path = if let Some(name) = name {
             self.name_to_path(name)
         } else {
-            self.match_cwd()?.0
+            // dir isn't read, so None can be passed as base
+            self.match_cwd(None)?.0
         };
 
         if !path.is_file() {
@@ -108,9 +109,9 @@ impl Library {
         Ok(path)
     }
 
-    pub fn list_files(&self) -> Result<(), Box<dyn Error>> {
+    pub fn list_files(&self, base: Option<&Path>) -> Result<(), Box<dyn Error>> {
         for file in self.get_all_files()? {
-            if let Ok(inst) = read(&file) {
+            if let Ok(inst) = read(&file, base) {
                 println!("{} - {}", file.file_stem().unwrap().to_string_lossy(), inst.dir.to_string_lossy());
             }
         }
@@ -183,11 +184,11 @@ impl Library {
         Ok(open::that(&self.dir)?)
     }
 
-    pub fn match_cwd(&self) -> Result<(PathBuf, InstructionFile), Box<dyn Error>> {
+    pub fn match_cwd(&self, base: Option<&Path>) -> Result<(PathBuf, InstructionFile), Box<dyn Error>> {
         let cwd = env::current_dir()?;
 
         for path in self.get_all_files()? {
-            if let Ok(inst) = read(&path) {
+            if let Ok(inst) = read(&path, base) {
                 if inst.dir == cwd {
                     return Ok((path, inst));
                 }
