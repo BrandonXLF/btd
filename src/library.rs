@@ -26,13 +26,17 @@ impl Library {
         let dir = match path_str {
             Some("base") => base_dir.clone(),
             Some(path) => PathBuf::from(path),
-            None => base_dir.clone()
+            None => base_dir.clone(),
         };
         fs::create_dir_all(&dir).map_err(|_| "Could not make library directory")?;
 
         let base: Option<PathBuf> = base_str.map(|x| x.to_path_buf());
 
-        let mut lib = Library{ base_dir, dir, base };
+        let mut lib = Library {
+            base_dir,
+            dir,
+            base,
+        };
 
         lib.load_config("link", path_str);
         lib.load_config("base", base_str);
@@ -48,13 +52,13 @@ impl Library {
 
     fn apply_link_dir(&mut self, path_str: &str) -> Result<(), Box<dyn Error>> {
         let path = PathBuf::from(&path_str);
-        
+
         match fs::create_dir_all(&path) {
             Ok(_) => {
                 self.dir = path;
                 Ok(())
-            },
-            Err(_) => Err("Could not make linked library directory".into())
+            }
+            Err(_) => Err("Could not make linked library directory".into()),
         }
     }
 
@@ -103,7 +107,11 @@ impl Library {
     pub fn list_files(&self) -> Result<(), Box<dyn Error>> {
         for file in self.get_all_files()? {
             if let Ok(inst) = read(&file, self.base.as_deref()) {
-                println!("{} - {}", file.file_stem().unwrap().to_string_lossy(), inst.dir.to_string_lossy());
+                println!(
+                    "{} - {}",
+                    file.file_stem().unwrap().to_string_lossy(),
+                    inst.dir.to_string_lossy()
+                );
             }
         }
 
@@ -198,8 +206,8 @@ impl Library {
             }
             "base" => {
                 self.base = Some(PathBuf::from(val));
-            },
-            &_ => return Err(format!("Unknown Library config {}", name).into())
+            }
+            &_ => return Err(format!("Unknown Library config {}", name).into()),
         }
 
         Ok(())
@@ -215,15 +223,15 @@ impl Library {
         Ok(())
     }
 
-    fn unsave_config(&mut self, name: &str) -> Result<(), Box<dyn Error>>  {
+    fn unsave_config(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
         match name {
             "link" => {
                 self.dir = self.base_dir.clone();
             }
             "base" => {
                 self.base = None;
-            },
-            &_ => return Err(format!("Unknown Library config {}", name).into())
+            }
+            &_ => return Err(format!("Unknown Library config {}", name).into()),
         }
 
         let file_name = ".".to_owned() + name;
@@ -236,7 +244,7 @@ impl Library {
     pub fn save_config(&mut self, name: &str, val: Option<&str>) -> Result<(), Box<dyn Error>> {
         match val {
             Some(val) => self.save_set_config(name, val),
-            None => self.unsave_config(name)
+            None => self.unsave_config(name),
         }
     }
 
@@ -250,12 +258,12 @@ impl Library {
 
         let apply_res = match fs::read_to_string(link_file) {
             Ok(val) => self.apply_set_config(name, &val),
-            Err(_) => Ok(())
+            Err(_) => Ok(()),
         };
 
         match apply_res {
             Ok(_) => (),
-            Err(err) => eprintln!("{}", err)
+            Err(err) => eprintln!("{}", err),
         }
     }
 }

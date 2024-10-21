@@ -1,11 +1,16 @@
 use std::{env, error::Error, path::PathBuf};
 
-use crate::{builder::Builder, library::Library, messages::{show_help, show_version}, out_of_lib::OutOfLibrary};
+use crate::{
+    builder::Builder,
+    library::Library,
+    messages::{show_help, show_version},
+    out_of_lib::OutOfLibrary,
+};
 
 pub struct Args {
     dir: Option<String>,
     base_path: Option<PathBuf>,
-    other_args: Vec<String>
+    other_args: Vec<String>,
 }
 
 impl Args {
@@ -34,7 +39,11 @@ impl Args {
             }
         }
 
-        return Args{ dir, base_path, other_args };
+        return Args {
+            dir,
+            base_path,
+            other_args,
+        };
     }
 
     pub fn get_lib(&self) -> Result<Library, Box<dyn Error>> {
@@ -42,7 +51,9 @@ impl Args {
     }
 
     pub fn get_out_of_lib(&self) -> OutOfLibrary {
-        OutOfLibrary { base: self.base_path.clone() }
+        OutOfLibrary {
+            base: self.base_path.clone(),
+        }
     }
 
     fn get_unnamed(&self) -> Option<&str> {

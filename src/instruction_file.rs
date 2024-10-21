@@ -1,10 +1,17 @@
-use std::{error::Error, fs::File, path::{Path, PathBuf}};
+use std::{
+    error::Error,
+    fs::File,
+    path::{Path, PathBuf},
+};
 
-use crate::{args::Args, transformation::{Transformation, TransformationTrait}};
+use crate::{
+    args::Args,
+    transformation::{Transformation, TransformationTrait},
+};
 
 pub struct InstructionFile {
     pub dir: PathBuf,
-    pub steps: Vec<Transformation>
+    pub steps: Vec<Transformation>,
 }
 
 pub fn read(path: &Path, base: Option<&Path>) -> Result<InstructionFile, Box<dyn Error>> {
@@ -14,7 +21,7 @@ pub fn read(path: &Path, base: Option<&Path>) -> Result<InstructionFile, Box<dyn
     if steps.len() == 0 {
         return Err("Missing meta step".into());
     }
-    
+
     let meta = steps.remove(0);
     let mut dir = PathBuf::from(meta.get_req_str("dir", 0)?);
 
@@ -23,7 +30,7 @@ pub fn read(path: &Path, base: Option<&Path>) -> Result<InstructionFile, Box<dyn
             dir = base.join(dir);
         }
     }
-    
+
     return Ok(InstructionFile { dir, steps });
 }
 
@@ -45,7 +52,10 @@ fn resolve_path(path: &str) -> Option<PathBuf> {
     None
 }
 
-fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<InstructionFile, Box<dyn Error>> {
+fn resolve_name_or_path(
+    name_or_path: &str,
+    args: &Args,
+) -> Result<InstructionFile, Box<dyn Error>> {
     if let Some(path) = resolve_path(name_or_path) {
         Ok(read(&path, args.get_out_of_lib().base.as_deref())?)
     } else if let Some(inst) = args.get_lib()?.read_name(name_or_path)? {

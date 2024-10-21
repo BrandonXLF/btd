@@ -1,5 +1,5 @@
 use std::path::PathBuf;
 
 pub struct OutOfLibrary {
-	pub base: Option<PathBuf>,
+    pub base: Option<PathBuf>,
 }

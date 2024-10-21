@@ -10,14 +10,16 @@ use std::{
 use system::{system_output, System};
 
 use crate::{
-    args::Args, instruction_file::find, transformation::{Transformation, TransformationTrait}
+    args::Args,
+    instruction_file::find,
+    transformation::{Transformation, TransformationTrait},
 };
 
 static STAGES: &[char] = &['🥚', '🐣', '🐤', '🐔'];
 
 pub struct Builder {
     dir: PathBuf,
-    stage: usize
+    stage: usize,
 }
 
 impl Builder {
