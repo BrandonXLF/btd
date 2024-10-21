@@ -4,7 +4,6 @@ use std::{
     fs::{self, read_dir, remove_file, rename, File},
     io::{stdin, stdout, Write},
     path::PathBuf,
-    str::FromStr,
 };
 
 use crate::{
@@ -25,7 +24,7 @@ impl Library {
 
         let dir = match path_str {
             Some("base") => base_dir.clone(),
-            Some(path) => PathBuf::from_str(path).map_err(|_| "Invalid library path")?,
+            Some(path) => PathBuf::from(path),
             None => base_dir.clone()
         };
         fs::create_dir_all(&dir).map_err(|_| "Could not make library directory")?;
@@ -49,17 +48,14 @@ impl Library {
     }
 
     fn apply_link_dir(&mut self, path_str: &str) -> Result<(), Box<dyn Error>> {
-        match PathBuf::from_str(&path_str) {
-            Ok(path) => {
-                match fs::create_dir_all(&path) {
-                    Ok(_) => {
-                        self.dir = path;
-                        Ok(())
-                    },
-                    Err(_) => Err("Could not make linked library directory".into())
-                }
+        let path = PathBuf::from(&path_str);
+        
+        match fs::create_dir_all(&path) {
+            Ok(_) => {
+                self.dir = path;
+                Ok(())
             },
-            Err(_) => Err("Could not parse linked library directory".into())
+            Err(_) => Err("Could not make linked library directory".into())
         }
     }
 
