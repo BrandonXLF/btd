@@ -3,15 +3,15 @@ use std::{env, error::Error, path::PathBuf};
 use crate::{builder::Builder, library::Library, out_of_lib::OutOfLibrary};
 
 pub struct Args {
-    lib: Option<String>,
+    dir: Option<String>,
     base_path: Option<PathBuf>,
     other_args: Vec<String>
 }
 
 impl Args {
     pub fn new() -> Args {
-        let mut next_lib = false;
-        let mut lib = None;
+        let mut next_dir = false;
+        let mut dir = None;
 
         let mut next_base_path = false;
         let mut base_path = None;
@@ -19,14 +19,14 @@ impl Args {
         let mut other_args: Vec<String> = Vec::new();
 
         for arg in env::args() {
-            if next_lib {
-                lib = Some(arg);
-                next_lib = false;
+            if next_dir {
+                dir = Some(arg);
+                next_dir = false;
             } else if next_base_path {
                 base_path = Some(PathBuf::from(arg));
                 next_base_path = false;
-            } else if arg == "--lib" {
-                next_lib = true;
+            } else if arg == "--dir" {
+                next_dir = true;
             } else if arg == "--base" {
                 next_base_path = true;
             } else {
@@ -34,11 +34,11 @@ impl Args {
             }
         }
 
-        return Args{ lib, base_path, other_args };
+        return Args{ dir, base_path, other_args };
     }
 
     pub fn get_lib(&self) -> Result<Library, Box<dyn Error>> {
-        Library::new(self.lib.as_deref(), self.base_path.as_deref())
+        Library::new(self.dir.as_deref(), self.base_path.as_deref())
     }
 
     pub fn get_out_of_lib(&self) -> OutOfLibrary {
@@ -61,7 +61,7 @@ impl Args {
             "--list" => self.get_lib()?.list_files(),
             "--open" => self.get_lib()?.open(),
             "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
-            "--set-lib" => self.get_lib()?.save_config("link", self.get_unnamed()),
+            "--set-dir" => self.get_lib()?.save_config("link", self.get_unnamed()),
             "--set-base" => self.get_lib()?.save_config("base", self.get_unnamed()),
             "--help" => show_help(),
             "--version" => show_version(),
@@ -72,8 +72,8 @@ impl Args {
 
 pub fn show_help() -> Result<(), Box<dyn Error>> {
     println!("Usage: btd [<name>]
-       btd <--create | --delete | --edit | --rename> [<name>] [--lib <lib>] [--base <base>]
-       btd <--set-lib | --set-base> [<value>]
+       btd <--create | --delete | --edit | --rename> [<name>] [--dir <dir>] [--base <base>]
+       btd <--set-dir | --set-base> [<value>]
        btd <--list | --open>
        btd <--help | --version>
 
@@ -99,13 +99,13 @@ Library actions:
                         renamed.
 
 Library options:
-    --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass
+    --dir [<dir>]   Read instruction files from the library located in the <dir> directory. Pass
                     \"--lib base\" to use the default library location.
     --base [<base>] Base directory for the meta dir of instruction files. Defaults to the current
                     working directory.
 
 Library default config:
-    --set-lib [<value>]     Set the default directory to use as the library's location.
+    --set-dir [<value>]     Set the default directory to use as the library's location.
     --set-base [<value>]    Set the default base to use for the meta directory of instruction files.
 
 Program information:
