@@ -7,8 +7,8 @@ use std::{
 };
 
 use crate::{
-    read::read_instruction_file,
-    transformation::{MetaTransformation, Transformation, TransformationTrait},
+    instruction_file::{read, InstructionFile},
+    transformation::MetaTransformation,
 };
 
 pub struct Library {
@@ -98,7 +98,7 @@ impl Library {
         let path = if let Some(name) = name {
             self.name_to_path(name)
         } else {
-            self.match_by_dir()?.0
+            self.match_cwd()?.0
         };
 
         if !path.is_file() {
@@ -107,13 +107,11 @@ impl Library {
 
         Ok(path)
     }
+
     pub fn list_files(&self) -> Result<(), Box<dyn Error>> {
         for file in self.get_all_files()? {
-            if let Ok(steps) = read_instruction_file(&file) {
-                let meta = steps.get(0).ok_or("Missing meta step")?;
-                let dir = meta.get_req_str("dir", 0)?;
-
-                println!("{} - {}", file.file_stem().unwrap().to_string_lossy(), dir);
+            if let Ok(inst) = read(&file) {
+                println!("{} - {}", file.file_stem().unwrap().to_string_lossy(), inst.dir.to_string_lossy());
             }
         }
 
@@ -185,17 +183,13 @@ impl Library {
         Ok(open::that(&self.dir)?)
     }
 
-    pub fn match_by_dir(&self) -> Result<(PathBuf, Vec<Transformation>), Box<dyn Error>> {
+    pub fn match_cwd(&self) -> Result<(PathBuf, InstructionFile), Box<dyn Error>> {
         let cwd = env::current_dir()?;
 
         for path in self.get_all_files()? {
-            if let Ok(steps) = read_instruction_file(&path) {
-                let step = steps.get(0);
-                let meta = step.as_ref().ok_or("Missing meta step")?;
-                let dir = meta.get_req_str("dir", 0)?;
-
-                if dir == &cwd.to_string_lossy() {
-                    return Ok((path, steps));
+            if let Ok(inst) = read(&path) {
+                if inst.dir == cwd {
+                    return Ok((path, inst));
                 }
             }
         }

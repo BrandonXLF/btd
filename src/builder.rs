@@ -10,36 +10,26 @@ use std::{
 use system::{system_output, System};
 
 use crate::{
-    args::Args, read::find_instructions, transformation::{Transformation, TransformationTrait}
+    args::Args, instruction_file::find, transformation::{Transformation, TransformationTrait}
 };
 
 static STAGES: &[char] = &['🥚', '🐣', '🐤', '🐔'];
 
-pub struct Builder<'a> {
-    dir: &'a Path,
+pub struct Builder {
+    dir: PathBuf,
     stage: usize
 }
 
-impl Builder<'_> {
-    fn new(dir: &str) -> Builder {
-        Builder {
-            dir: Path::new(dir),
-            stage: 0,
-        }
+impl Builder {
+    fn new(dir: PathBuf) -> Builder {
+        Builder { dir, stage: 0 }
     }
 
     pub fn process_file(name: Option<&str>, args: &Args) -> Result<(), Box<dyn Error>> {
-        let mut steps = find_instructions(name, args)?;
+        let inst = find(name, args)?;
+        let mut output = Builder::new(inst.dir);
 
-        if steps.len() == 0 {
-            return Err("Missing meta step".into());
-        }
-
-        let meta = steps.remove(0);
-        let dir = meta.get_req_str("dir", 0)?;
-        let mut output = Builder::new(&dir);
-
-        for (i, step) in steps.iter().enumerate() {
+        for (i, step) in inst.steps.iter().enumerate() {
             output.do_step(step, i + 1)?;
         }
 
@@ -118,7 +108,7 @@ impl Builder<'_> {
                 if let Some(cwd) = step.get_opt_str("cwd", i)? {
                     rust_cmd.current_dir(self.dir.join(cwd));
                 } else {
-                    rust_cmd.current_dir(self.dir);
+                    rust_cmd.current_dir(&self.dir);
                 }
 
                 if let Some(envs) = step.get_opt_map("env", i)? {

@@ -1,11 +1,24 @@
 use std::{error::Error, fs::File, path::PathBuf};
 
-use crate::{args::Args, transformation::Transformation};
+use crate::{args::Args, transformation::{Transformation, TransformationTrait}};
 
-pub fn read_instruction_file(name: &PathBuf) -> Result<Vec<Transformation>, Box<dyn Error>> {
-    let reader = File::open(name)?;
-    let steps: Vec<Transformation> = serde_yaml::from_reader(reader)?;
-    return Ok(steps);
+pub struct InstructionFile {
+    pub dir: PathBuf,
+    pub steps: Vec<Transformation>
+}
+
+pub fn read(path: &PathBuf) -> Result<InstructionFile, Box<dyn Error>> {
+    let reader = File::open(path)?;
+    let mut steps: Vec<Transformation> = serde_yaml::from_reader(reader)?;
+
+    if steps.len() == 0 {
+        return Err("Missing meta step".into());
+    }
+    
+    let meta = steps.remove(0);
+    let dir = PathBuf::from(meta.get_req_str("dir", 0)?);
+    
+    return Ok(InstructionFile { dir, steps });
 }
 
 fn resolve_path(path: &str) -> Option<PathBuf> {
@@ -38,14 +51,11 @@ fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<PathBuf, Box<
     }
 }
 
-pub fn find_instructions(
-    name_or_path: Option<&str>,
-    args: &Args
-) -> Result<Vec<Transformation>, Box<dyn Error>> {
+pub fn find(name_or_path: Option<&str>, args: &Args) -> Result<InstructionFile, Box<dyn Error>> {
     if let Some(name_or_path) = name_or_path {
         let path = resolve_name_or_path(name_or_path, args)?;
-        read_instruction_file(&path)
+        read(&path)
     } else {
-        Ok(args.get_lib()?.match_by_dir()?.1)
+        Ok(args.get_lib()?.match_cwd()?.1)
     }
 }

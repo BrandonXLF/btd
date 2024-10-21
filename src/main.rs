@@ -1,7 +1,7 @@
 mod args;
 mod builder;
 mod library;
-mod read;
+mod instruction_file;
 mod transformation;
 
 use std::process::exit;
