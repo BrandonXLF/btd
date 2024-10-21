@@ -1,11 +1,11 @@
 use std::{env, error::Error, path::PathBuf};
 
-use crate::{builder::Builder, library::Library};
+use crate::{builder::Builder, library::Library, out_of_lib::OutOfLibrary};
 
 pub struct Args {
-    pub lib: Option<String>,
-    pub base_path: Option<PathBuf>,
-    pub other_args: Vec<String>
+    lib: Option<String>,
+    base_path: Option<PathBuf>,
+    other_args: Vec<String>
 }
 
 impl Args {
@@ -38,7 +38,11 @@ impl Args {
     }
 
     pub fn get_lib(&self) -> Result<Library, Box<dyn Error>> {
-        Library::new(self.lib.as_deref())
+        Library::new(self.lib.as_deref(), self.base_path.as_deref())
+    }
+
+    pub fn get_out_of_lib(&self) -> OutOfLibrary {
+        OutOfLibrary { base: self.base_path.clone() }
     }
 
     fn get_unnamed(&self) -> Option<&str> {
@@ -54,10 +58,11 @@ impl Args {
             "--create" => self.get_lib()?.create_file(self.get_unnamed()),
             "--delete" => self.get_lib()?.delete_file(self.get_unnamed()),
             "--edit" => self.get_lib()?.edit_file(self.get_unnamed()),
-            "--list" => self.get_lib()?.list_files(self.base_path.as_deref()),
+            "--list" => self.get_lib()?.list_files(),
             "--open" => self.get_lib()?.open(),
             "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
-            "--set-lib" => self.get_lib()?.write_link(self.get_unnamed()),
+            "--set-lib" => self.get_lib()?.save_config("link", self.get_unnamed()),
+            "--set-base" => self.get_lib()?.save_config("base", self.get_unnamed()),
             "--help" => show_help(),
             "--version" => show_version(),
             _ => Builder::process_file(Some(&self.other_args[1]), &self),
@@ -73,7 +78,7 @@ pub fn show_help() -> Result<(), Box<dyn Error>> {
 
 Running Instruction Files
     [<name>]    If no <name> is specified, the script in The Library with its meta dir set to the
-                current directory will be run. Otherwise, the <name> script will be run if it exists,
+                current directory will be run. Otherwise, the <name> script will be run if it exists without any library defaults,
                 and if it doesn't, the script with the name <name> in The Library will be run. .yml
                 is added to <name> as required.
 
@@ -91,14 +96,16 @@ The Library
     --rename [<name>]   Rename the Instruction File in The Library with the given name. If no name is
                         given, the Instruction File corresponding to the current directory will be
                         renamed.
-    --set-lib           Set the directory to use as the library location. You can access the default
-                        library using \"--lib base\".
+    --set-lib           Set the default directory to use as the library location. You can access the
+                        initial default library using \"--lib base\".
+    --set-base          Set the default base to use for the meta directory of Instruction Files.
+                        Defaults to the current working directory.
 
 Library Options
     --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass <lib>
                     as base to use the default library location.
-    --base [<base>] Base directory for the meta directory of Instruction Files. Default to the current
-                    working directory.
+    --base [<base>] Base directory for the meta directory of Instruction Files. Defaults to the
+                    current working directory.
 
 Program Information
     --help          Show this help message and exit.

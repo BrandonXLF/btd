@@ -45,11 +45,11 @@ fn resolve_path(path: &str) -> Option<PathBuf> {
     None
 }
 
-fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<PathBuf, Box<dyn Error>> {
+fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<InstructionFile, Box<dyn Error>> {
     if let Some(path) = resolve_path(name_or_path) {
-        Ok(path)
-    } else if let Some(path) = args.get_lib()?.resolve_name(name_or_path) {
-        Ok(path)
+        Ok(read(&path, args.get_out_of_lib().base.as_deref())?)
+    } else if let Some(inst) = args.get_lib()?.read_name(name_or_path)? {
+        Ok(inst)
     } else {
         return Err(
             "No Instruction File found. Run btd --list to see available Instruction Files.".into(),
@@ -59,9 +59,8 @@ fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<PathBuf, Box<
 
 pub fn find(name_or_path: Option<&str>, args: &Args) -> Result<InstructionFile, Box<dyn Error>> {
     if let Some(name_or_path) = name_or_path {
-        let path = resolve_name_or_path(name_or_path, args)?;
-        read(&path, args.base_path.as_deref())
+        resolve_name_or_path(name_or_path, args)
     } else {
-        Ok(args.get_lib()?.match_cwd(args.base_path.as_deref())?.1)
+        Ok(args.get_lib()?.match_cwd()?.1)
     }
 }

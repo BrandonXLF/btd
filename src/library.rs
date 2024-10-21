@@ -14,10 +14,11 @@ use crate::{
 pub struct Library {
     base_dir: PathBuf,
     dir: PathBuf,
+    base: Option<PathBuf>,
 }
 
 impl Library {
-    pub fn new(path_str: Option<&str>) -> Result<Library, Box<dyn Error>> {
+    pub fn new(path_str: Option<&str>, base_str: Option<&Path>) -> Result<Library, Box<dyn Error>> {
         let mut base_dir = dirs::data_dir().ok_or_else(|| "Failed to get config directory")?;
         base_dir.push("btd-library");
         fs::create_dir_all(&base_dir).map_err(|_| "Could not make base library directory")?;
@@ -29,21 +30,19 @@ impl Library {
         };
         fs::create_dir_all(&dir).map_err(|_| "Could not make library directory")?;
 
-        let mut lib = Library{ base_dir, dir };
-        
-        if path_str.is_none() {
-            match lib.follow_link_if_exists() {
-                Ok(_) => (),
-                Err(err) => eprintln!("{}", err)
-            }
-        }
+        let base: Option<PathBuf> = base_str.map(|x| x.to_path_buf());
+
+        let mut lib = Library{ base_dir, dir, base };
+
+        lib.load_config("link", path_str);
+        lib.load_config("base", base_str);
 
         return Ok(lib);
     }
 
-    fn get_link_file(&self) -> PathBuf {
+    fn get_config_file(&self, name: &str) -> PathBuf {
         let mut link_file = self.base_dir.clone();
-        link_file.push(".link");
+        link_file.push(name);
         link_file
     }
 
@@ -59,13 +58,6 @@ impl Library {
         }
     }
 
-    fn follow_link_if_exists(&mut self) -> Result<(), Box<dyn Error>> {
-        match fs::read_to_string(self.get_link_file()) {
-            Ok(path_str) => self.apply_link_dir(&path_str),
-            Err(_) => Ok(())
-        }
-    }
-
     fn name_to_path(&self, name: &str) -> PathBuf {
         let mut path = self.dir.join(name);
 
@@ -76,14 +68,14 @@ impl Library {
         path
     }
 
-    pub fn resolve_name(&self, name: &str) -> Option<PathBuf> {
+    pub fn read_name(&self, name: &str) -> Result<Option<InstructionFile>, Box<dyn Error>> {
         let path = self.name_to_path(name);
 
         if path.is_file() {
-            return Some(path);
+            return Ok(Some(read(&path, self.base.as_deref())?));
         }
 
-        None
+        Ok(None)
     }
 
     pub fn get_all_files(&self) -> Result<impl Iterator<Item = PathBuf>, Box<dyn Error>> {
@@ -98,8 +90,7 @@ impl Library {
         let path = if let Some(name) = name {
             self.name_to_path(name)
         } else {
-            // dir isn't read, so None can be passed as base
-            self.match_cwd(None)?.0
+            self.match_cwd()?.0
         };
 
         if !path.is_file() {
@@ -109,9 +100,9 @@ impl Library {
         Ok(path)
     }
 
-    pub fn list_files(&self, base: Option<&Path>) -> Result<(), Box<dyn Error>> {
+    pub fn list_files(&self) -> Result<(), Box<dyn Error>> {
         for file in self.get_all_files()? {
-            if let Ok(inst) = read(&file, base) {
+            if let Ok(inst) = read(&file, self.base.as_deref()) {
                 println!("{} - {}", file.file_stem().unwrap().to_string_lossy(), inst.dir.to_string_lossy());
             }
         }
@@ -184,11 +175,11 @@ impl Library {
         Ok(open::that(&self.dir)?)
     }
 
-    pub fn match_cwd(&self, base: Option<&Path>) -> Result<(PathBuf, InstructionFile), Box<dyn Error>> {
+    pub fn match_cwd(&self) -> Result<(PathBuf, InstructionFile), Box<dyn Error>> {
         let cwd = env::current_dir()?;
 
         for path in self.get_all_files()? {
-            if let Ok(inst) = read(&path, base) {
+            if let Ok(inst) = read(&path, self.base.as_deref()) {
                 if inst.dir == cwd {
                     return Ok((path, inst));
                 }
@@ -200,20 +191,71 @@ impl Library {
         );
     }
 
-    pub fn write_link(&mut self, path: Option<&str>) -> Result<(), Box<dyn Error>> {
-        let link_file = self.get_link_file();
-
-        match path {
-            Some(path) => {
-                self.apply_link_dir(path)?;
-                fs::write(link_file, path)?;
-            },
-            None => {
-                self.dir = self.base_dir.clone();
-                fs::remove_file(link_file)?;
+    fn apply_set_config(&mut self, name: &str, val: &str) -> Result<(), Box<dyn Error>> {
+        match name {
+            "link" => {
+                self.apply_link_dir(val)?;
             }
+            "base" => {
+                self.base = Some(PathBuf::from(val));
+            },
+            &_ => return Err(format!("Unknown Library config {}", name).into())
         }
 
         Ok(())
+    }
+
+    fn save_set_config(&mut self, name: &str, val: &str) -> Result<(), Box<dyn Error>> {
+        self.apply_set_config(name, val)?;
+
+        let file_name = ".".to_owned() + name;
+        let link_file = self.get_config_file(&file_name);
+        fs::write(link_file, val)?;
+
+        Ok(())
+    }
+
+    fn unsave_config(&mut self, name: &str) -> Result<(), Box<dyn Error>>  {
+        match name {
+            "link" => {
+                self.dir = self.base_dir.clone();
+            }
+            "base" => {
+                self.base = None;
+            },
+            &_ => return Err(format!("Unknown Library config {}", name).into())
+        }
+
+        let file_name = ".".to_owned() + name;
+        let link_file = self.get_config_file(&file_name);
+        fs::remove_file(link_file)?;
+
+        Ok(())
+    }
+
+    pub fn save_config(&mut self, name: &str, val: Option<&str>) -> Result<(), Box<dyn Error>> {
+        match val {
+            Some(val) => self.save_set_config(name, val),
+            None => self.unsave_config(name)
+        }
+    }
+
+    fn load_config<T>(&mut self, name: &str, override_val: Option<T>) {
+        if override_val.is_some() {
+            return;
+        }
+
+        let file_name = ".".to_owned() + name;
+        let link_file = self.get_config_file(&file_name);
+
+        let apply_res = match fs::read_to_string(link_file) {
+            Ok(val) => self.apply_set_config(name, &val),
+            Err(_) => Ok(())
+        };
+
+        match apply_res {
+            Ok(_) => (),
+            Err(err) => eprintln!("{}", err)
+        }
     }
 }

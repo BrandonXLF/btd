@@ -3,6 +3,7 @@ mod builder;
 mod library;
 mod instruction_file;
 mod transformation;
+mod out_of_lib;
 
 use std::process::exit;
 
