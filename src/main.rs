@@ -4,6 +4,7 @@ mod library;
 mod instruction_file;
 mod transformation;
 mod out_of_lib;
+mod messages;
 
 use std::process::exit;
 
