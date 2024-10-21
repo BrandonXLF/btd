@@ -2,6 +2,7 @@ mod args;
 mod builder;
 mod instruction_file;
 mod library;
+mod library_config;
 mod messages;
 mod out_of_lib;
 mod transformation;

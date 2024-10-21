@@ -8,6 +8,7 @@ use std::{
 
 use crate::{
     instruction_file::{read, InstructionFile},
+    library_config::LibraryConfig,
     transformation::MetaTransformation,
 };
 
@@ -38,16 +39,9 @@ impl Library {
             base,
         };
 
-        lib.load_config("link", path_str);
-        lib.load_config("base", base_str);
+        lib.apply_saved_config(path_str.is_some());
 
         return Ok(lib);
-    }
-
-    fn get_config_file(&self, name: &str) -> PathBuf {
-        let mut link_file = self.base_dir.clone();
-        link_file.push(name);
-        link_file
     }
 
     fn apply_link_dir(&mut self, path_str: &str) -> Result<(), Box<dyn Error>> {
@@ -199,71 +193,92 @@ impl Library {
         );
     }
 
-    fn apply_set_config(&mut self, name: &str, val: &str) -> Result<(), Box<dyn Error>> {
+    fn get_config_file_path(&self) -> PathBuf {
+        self.base_dir.join(".config")
+    }
+
+    fn read_saved_config(&self) -> Result<Option<LibraryConfig>, Box<dyn Error>> {
+        match File::open(self.get_config_file_path()) {
+            Ok(config_file) => {
+                let config_data: LibraryConfig = serde_yaml::from_reader(config_file)?;
+                Ok(Some(config_data))
+            }
+            Err(_) => Ok(None),
+        }
+    }
+
+    fn apply_config_value(&mut self, name: &str, val: &str) -> Result<(), Box<dyn Error>> {
         match name {
-            "link" => {
-                self.apply_link_dir(val)?;
-            }
-            "base" => {
-                self.base = Some(PathBuf::from(val));
-            }
+            "dir" => self.apply_link_dir(val)?,
+            "base" => self.base = Some(PathBuf::from(val)),
             &_ => return Err(format!("Unknown Library config {}", name).into()),
         }
 
         Ok(())
     }
 
-    fn save_set_config(&mut self, name: &str, val: &str) -> Result<(), Box<dyn Error>> {
-        self.apply_set_config(name, val)?;
-
-        let file_name = ".".to_owned() + name;
-        let link_file = self.get_config_file(&file_name);
-        fs::write(link_file, val)?;
-
-        Ok(())
-    }
-
-    fn unsave_config(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
+    fn reset_config_value(&mut self, name: &str) -> Result<(), Box<dyn Error>> {
         match name {
-            "link" => {
-                self.dir = self.base_dir.clone();
-            }
-            "base" => {
-                self.base = None;
-            }
+            "dir" => self.dir = self.base_dir.clone(),
+            "base" => self.base = None,
             &_ => return Err(format!("Unknown Library config {}", name).into()),
         }
 
-        let file_name = ".".to_owned() + name;
-        let link_file = self.get_config_file(&file_name);
-        fs::remove_file(link_file)?;
-
         Ok(())
     }
 
-    pub fn save_config(&mut self, name: &str, val: Option<&str>) -> Result<(), Box<dyn Error>> {
+    pub fn save_config_value(
+        &mut self,
+        name: &str,
+        val: Option<&str>,
+    ) -> Result<(), Box<dyn Error>> {
         match val {
-            Some(val) => self.save_set_config(name, val),
-            None => self.unsave_config(name),
+            Some(val) => self.apply_config_value(name, val)?,
+            None => self.reset_config_value(name)?,
+        }
+
+        let mut config = self
+            .read_saved_config()
+            .unwrap_or(None)
+            .unwrap_or_else(|| LibraryConfig::new_empty());
+
+        match name {
+            "dir" => config.dir = val.map(|x| x.to_owned()),
+            "base" => config.base = val.map(|x| x.to_owned()),
+            &_ => return Err(format!("Unknown Library config {}", name).into()),
+        }
+
+        let file = File::create(self.get_config_file_path())
+            .map_err(|_| "Could not open library config for writing".to_owned())?;
+
+        serde_yaml::to_writer(file, &config).map_err(|_| "Could not write to library config".into())
+    }
+
+    fn apply_saved_config_value(&mut self, name: &str, val: Option<&str>) -> () {
+        if let Some(val) = val {
+            match self.apply_config_value(name, &val) {
+                Ok(_) => (),
+                Err(err) => eprintln!("{}", err),
+            }
         }
     }
 
-    fn load_config<T>(&mut self, name: &str, override_val: Option<T>) {
-        if override_val.is_some() {
-            return;
-        }
+    fn apply_saved_config(&mut self, dir_was_set: bool) -> () {
+        match self.read_saved_config() {
+            Ok(maybe_config) => {
+                if let Some(config) = maybe_config {
+                    if !dir_was_set {
+                        self.apply_saved_config_value("dir", config.dir.as_deref());
+                    }
 
-        let file_name = ".".to_owned() + name;
-        let link_file = self.get_config_file(&file_name);
-
-        let apply_res = match fs::read_to_string(link_file) {
-            Ok(val) => self.apply_set_config(name, &val),
-            Err(_) => Ok(()),
-        };
-
-        match apply_res {
-            Ok(_) => (),
-            Err(err) => eprintln!("{}", err),
+                    if self.base.is_none() {
+                        self.apply_saved_config_value("base", config.base.as_deref());
+                    }
+                }
+            }
+            Err(_) => {
+                eprintln!("Failed to read library config");
+            }
         }
     }
 }

@@ -72,8 +72,10 @@ impl Args {
             "--list" => self.get_lib()?.list_files(),
             "--open" => self.get_lib()?.open(),
             "--rename" => self.get_lib()?.rename_file(self.get_unnamed()),
-            "--set-dir" => self.get_lib()?.save_config("link", self.get_unnamed()),
-            "--set-base" => self.get_lib()?.save_config("base", self.get_unnamed()),
+            "--set-dir" => self.get_lib()?.save_config_value("dir", self.get_unnamed()),
+            "--set-base" => self
+                .get_lib()?
+                .save_config_value("base", self.get_unnamed()),
             "--help" => show_help(),
             "--version" => show_version(),
             _ => Builder::process_file(Some(&self.other_args[1]), &self),
