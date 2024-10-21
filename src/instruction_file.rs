@@ -52,7 +52,7 @@ fn resolve_name_or_path(name_or_path: &str, args: &Args) -> Result<InstructionFi
         Ok(inst)
     } else {
         return Err(
-            "No Instruction File found. Run btd --list to see available Instruction Files.".into(),
+            "No instruction file found. Run btd --list to see available instruction files.".into(),
         );
     }
 }

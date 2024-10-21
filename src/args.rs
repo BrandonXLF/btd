@@ -72,48 +72,49 @@ impl Args {
 
 pub fn show_help() -> Result<(), Box<dyn Error>> {
     println!("Usage: btd [<name>]
-       btd <--create | --delete | --edit | --rename> [<name>] [--lib <lib>]
+       btd <--create | --delete | --edit | --rename> [<name>] [--lib <lib>] [--base <base>]
+       btd <--set-lib | --set-base> [<value>]
        btd <--list | --open>
        btd <--help | --version>
 
-Running Instruction Files
-    [<name>]    If no <name> is specified, the script in The Library with its meta dir set to the
-                current directory will be run. Otherwise, the <name> script will be run if it exists without any library defaults,
-                and if it doesn't, the script with the name <name> in The Library will be run. .yml
-                is added to <name> as required.
+Running instruction files:
+    [<name>]    If no <name> is specified, the script in the library with its meta dir set to the
+                current directory will be run. Otherwise, if <name> is a path that exists, it will
+                be run without any library defaults. If it isn't, the script with the name <name> in
+                the library will be run. .yml is added to <name> as required.
 
-The Library
-    --create [<name>]   Create a new Instruction File in The Library with the given name. If no name
+Library actions:
+    --create [<name>]   Create a new instruction file in the library with the given name. If no name
                         is given, a prompt will show to enter a name.
-    --delete [<name>]   Delete the Instruction File in The Library with the give name. If no name is
-                        given, the Instruction File corresponding to the current directory will be
+    --delete [<name>]   Delete the instruction file in the library with the give name. If no name is
+                        given, the instruction file corresponding to the current directory will be
                         deleted.
-    --edit [<name>]     Edit the Instruction File in The Library with the given name. If no name is
-                        given, the Instruction File corresponding to the current directory will be
+    --edit [<name>]     Edit the instruction file in the library with the given name. If no name is
+                        given, the instruction file corresponding to the current directory will be
                         opened for editing.
-    --list              List all Instruction Files in The Library.
-    --open              Open the directory containing The Library.
-    --rename [<name>]   Rename the Instruction File in The Library with the given name. If no name is
-                        given, the Instruction File corresponding to the current directory will be
+    --list              List all instruction files in the library.
+    --open              Open the directory containing the library.
+    --rename [<name>]   Rename the instruction file in the library with the given name. If no name is
+                        given, the instruction file corresponding to the current directory will be
                         renamed.
-    --set-lib           Set the default directory to use as the library location. You can access the
-                        initial default library using \"--lib base\".
-    --set-base          Set the default base to use for the meta directory of Instruction Files.
-                        Defaults to the current working directory.
 
-Library Options
-    --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass <lib>
-                    as base to use the default library location.
-    --base [<base>] Base directory for the meta directory of Instruction Files. Defaults to the
-                    current working directory.
+Library options:
+    --lib [<lib>]   Read instruction files from the library located in the <lib> directory. Pass
+                    \"--lib base\" to use the default library location.
+    --base [<base>] Base directory for the meta dir of instruction files. Defaults to the current
+                    working directory.
 
-Program Information
+Library default config:
+    --set-lib [<value>]     Set the default directory to use as the library's location.
+    --set-base [<value>]    Set the default base to use for the meta directory of instruction files.
+
+Program information:
     --help          Show this help message and exit.
     --version       Print the version of btd and exit.
 
-Instruction File Format
-    Visit https://brandonxlf.github.io/btd/file-format/ for information in the Instruction File
-    file format.");
+Instruction file format:
+    Visit https://brandonxlf.github.io/btd/file-format/ for information in the instruction file file
+    format.");
 
     Ok(())
 }

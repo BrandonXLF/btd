@@ -8,7 +8,7 @@
 
 ### Convenient File Format
 
-Transformations are stored in [Instruction Files](https://brandonxlf.github.io/btd/file-format/) that are created using the easy-to-edit YAML file format. YAML makes it trivial to define multiline strings strings wile requiring minimal syntax.
+Transformations are stored in [instruction files](https://brandonxlf.github.io/btd/file-format/) that are created using the easy-to-edit YAML file format. YAML makes it trivial to define multiline strings strings wile requiring minimal syntax.
 
 ### User-Wide Store
 

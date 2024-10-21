@@ -1,6 +1,6 @@
 # File Format
 
-Instruction Files are YAML files consisting of a list of [Transformations](#transformations). To learn more about the YAML file format, visit [yaml.org](https://yaml.org/).
+**Instruction files** are YAML files consisting of a list of [Transformations](#transformations). To learn more about the YAML file format, visit [yaml.org](https://yaml.org/).
 
 ## Transformations
 
@@ -8,7 +8,7 @@ Each Transformation is a YAML dictionary with a `type` key corresponding to one 
 
 ### `meta`
 
-The first entry. Contains information about the Instruction File.
+The first entry. Contains information about the instruction file.
 
 * `dir` string - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
 

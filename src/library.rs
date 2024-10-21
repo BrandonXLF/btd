@@ -94,7 +94,7 @@ impl Library {
         };
 
         if !path.is_file() {
-            return Err("Instruction File not found".into());
+            return Err("instruction file not found".into());
         }
 
         Ok(path)
@@ -114,7 +114,7 @@ impl Library {
         let path = if let Some(name) = name {
             self.name_to_path(name)
         } else {
-            print!("\nEnter Instruction File name: ");
+            print!("\nEnter instruction file name: ");
             let _ = stdout().flush();
 
             let mut name = String::new();
@@ -145,7 +145,7 @@ impl Library {
     pub fn delete_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let path = self.get_existing_dir(name)?;
 
-        remove_file(path).map_err(|_| "Failed to remove Instruction File")?;
+        remove_file(path).map_err(|_| "Failed to remove instruction file")?;
         Ok(())
     }
 
@@ -187,7 +187,7 @@ impl Library {
         }
 
         return Err(
-            "No Instruction Files match the current directory. Run btd --help for help.".into(),
+            "No instruction files match the current directory. Run btd --help for help.".into(),
         );
     }
 
