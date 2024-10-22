@@ -92,7 +92,7 @@ impl Library {
         };
 
         if !path.is_file() {
-            return Err("instruction file not found".into());
+            return Err("Instruction file not found".into());
         }
 
         Ok(path)
