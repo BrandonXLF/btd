@@ -1,16 +1,16 @@
 # File Format
 
-**Instruction files** are YAML files consisting of a list of [Transformations](#transformations). To learn more about the YAML file format, visit [yaml.org](https://yaml.org/).
+**Instruction files** are YAML files consisting of a list of [transformations](#transformations). To learn more about the YAML file format, visit [yaml.org](https://yaml.org/).
 
 ## Transformations
 
-Each Transformation is a YAML dictionary with a `type` key corresponding to one of the options below.
+Each transformation is a YAML dictionary with a `type` key corresponding to one of the options below.
 
 ### `meta`
 
 The first entry. Contains information about the instruction file.
 
-* `dir` string - Directory of the codebase for the instruction file. Used as the base directory for commands and file operations. If this path is relative, [the library](/the-library/)'s base is used as the base for this path.
+* `dir` (*recommended*) string - Directory of the codebase for the instruction file. Used as the base directory for commands and file operations. If this path is relative, [the library](/the-library/)'s base is used as the base for this path. If omitted or blank, defaults to the library's base if part of the library of the current default directory. Recommended for files in the library.
 
 ### `run`
 

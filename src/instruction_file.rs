@@ -23,7 +23,7 @@ pub fn read(path: &Path, base: Option<&Path>) -> Result<InstructionFile, Box<dyn
     }
 
     let meta = steps.remove(0);
-    let mut dir = PathBuf::from(meta.get_req_str("dir", 0)?);
+    let mut dir = PathBuf::from(meta.get_opt_str("dir", 0)?.unwrap_or("."));
 
     if let Some(base) = base {
         if !dir.is_absolute() {
