@@ -30,7 +30,7 @@ Library actions:
 
 Library options:
     --dir [<dir>]   Read instruction files from the Library located in the <dir> directory. Pass
-                    \"--lib base\" to use the default library location.
+                    \"--dir base\" to use the default library location.
     --base [<base>] Base directory for the meta dir of instruction files. Defaults to the current
                     working directory.
 
