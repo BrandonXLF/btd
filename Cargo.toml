@@ -2,7 +2,7 @@
 name = "btd"
 description = "CLI tool to transform and deploy production builds of projects with file operations and commands."
 license = "GPL-3.0-or-later"
-version = "1.1.0"
+version = "1.1.1"
 edition = "2021"
 repository = "https://github.com/BrandonXLF/btd"
 documentation = "https://brandonxlf.github.io/btd/"
