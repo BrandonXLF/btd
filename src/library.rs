@@ -78,7 +78,7 @@ impl Library {
 
     pub fn get_all_files(&self) -> Result<impl Iterator<Item = PathBuf>, Box<dyn Error>> {
         return Ok(read_dir(&self.dir)
-            .map_err(|_| "Failed to read the library directory")?
+            .map_err(|_| "Failed to read the Library directory")?
             .filter_map(Result::ok)
             .filter(|entry| entry.path().is_file())
             .map(|entry| entry.path()));
