@@ -12,7 +12,7 @@ Transformations are stored in [instruction files](https://brandonxlf.github.io/b
 
 ### User-Wide Store
 
-Instructions can be in codebase or in a [user-wide library](https://brandonxlf.github.io/btd/the-library/) that allows for the separation of open-source projects from the specific instructions for deploying them to proprietary environments.
+Instructions can be located in codebase or in a [user-wide library](https://brandonxlf.github.io/btd/the-library/), located anywhere, that allows for the separation of open-source projects from the specific instructions for deploying them to proprietary environments.
 
 ## Installation
 

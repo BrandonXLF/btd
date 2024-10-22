@@ -18,4 +18,4 @@ Transformations are stored in [instruction files](/file-format/) that are create
 
 ## User-Wide Store
 
-Instructions can be in codebase or in a [user-wide library](/the-library/) that allows for the separation of open-source projects from the specific instructions for deploying them to proprietary environments.
+Instructions can be located in codebase or in a [user-wide library](/the-library/), located anywhere, that allows for the separation of open-source projects from the specific instructions for deploying them to proprietary environments.

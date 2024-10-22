@@ -10,7 +10,7 @@ Each Transformation is a YAML dictionary with a `type` key corresponding to one 
 
 The first entry. Contains information about the instruction file.
 
-* `dir` string - Base directory to use for commands and file operations. All relatives paths are processed relative to this path.
+* `dir` string - Directory of the codebase for the instruction file. Used as the base directory for commands and file operations. If this path is relative, [the library](/the-library/)'s base is used as the base for this path.
 
 ### `run`
 
