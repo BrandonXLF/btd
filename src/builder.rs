@@ -63,7 +63,11 @@ impl Builder {
         }
     }
 
-    fn run_remote_command(host: Option<&str>, cmd: &str) -> Result<Option<()>, Box<dyn Error>> {
+    fn run_remote_command(
+        host: Option<&str>,
+        cmd: &str,
+        other_acceptable: Option<&str>,
+    ) -> Result<bool, Box<dyn Error>> {
         let output = match host {
             Some(host) => Command::new("ssh")
                 .args(&["-tq", host, &format!("({}) && echo OK", cmd)])
@@ -73,12 +77,9 @@ impl Builder {
         .map_err(|_| "Failed to execute pre-deployment command")?;
 
         let stdout = String::from_utf8_lossy(&output.stdout);
+        let res = stdout.trim_end();
 
-        if stdout.trim_end() == "OK" {
-            Ok(Some(()))
-        } else {
-            Ok(None)
-        }
+        Ok(res == "OK" || other_acceptable.map(|x| res == x).unwrap_or(false))
     }
 
     fn deploy_scp(from: PathBuf, to: &str, display_from: &str) -> Result<(), Box<dyn Error>> {
@@ -244,68 +245,84 @@ impl Builder {
                 let (host, to_path) = Self::parse_scp_path(&to);
 
                 if step.get_opt_in_bool("clear", i)? {
-                    let type_str = if from_is_dir { "directory" } else { "file" };
+                    if !from_is_dir {
+                        return Err("\"clear\" can only be used with directories".into());
+                    }
+
                     let date_str = SystemTime::now()
                         .duration_since(UNIX_EPOCH)?
                         .as_millis()
                         .to_string();
+
                     let temp_to = to.to_owned() + "-" + &date_str;
                     let temp_to_path = to_path.to_owned() + "-" + &date_str;
 
+                    // Deploy to a temporary remote directory
                     Self::deploy_scp(from, &temp_to, name)?;
 
                     let temp_result = (|| -> Result<(), Box<dyn Error>> {
-                        if Self::run_remote_command(
+                        // Make sure the target directory exists
+                        Self::run_remote_command(host, &format!("mkdir \"{}\"", to_path), None)?;
+
+                        // Clear the target directory
+                        match Self::run_remote_command(
                             host,
-                            &format!("rm -rf \"{}\" || del /f /q \"{}\"", to_path, to_path),
-                        )?
-                        .is_none()
-                        {
-                            println!("\nCould not remove old deployment {}", to_path)
-                        } else {
-                            println!("\nRemoved old deployment {}", to_path)
+                            &format!("cd \"{}\" && (rm -rf * || rmdir /s /q .)", to_path),
+                            // Will delete everything but the current directory on Windows
+                            Some("The process cannot access the file because it is being used by another process.")
+                        )? {
+                            true => println!("\nCleared old deployment {}", to_path),
+                            false => println!("\nCould not clear old deployment {}", to_path),
                         }
 
-                        Self::run_remote_command(
+                        // Move temp files to the target directory
+                        if !Self::run_remote_command(
                             host,
-                            &format!("scp -r \"{}\" \"{}\"", temp_to_path, to_path),
-                        )?
-                        .ok_or_else(|| {
-                            format!(
-                                "Failed to move temporary {} {} to {}",
-                                type_str, temp_to_path, to_path
+                            &format!(
+                                "mv -f \"{}\"/* \"{}\" || move \"{}\\*\" \"{}\"",
+                                temp_to_path, to_path, temp_to_path, to_path
+                            ),
+                            None,
+                        )? {
+                            return Err(format!(
+                                "Failed to move temporary files in {} to {}",
+                                temp_to_path, to_path
                             )
-                        })?;
+                            .into());
+                        }
 
                         Ok(())
                     })();
 
-                    let cleanup_result = Self::run_remote_command(
+                    // Remove the temporary directory
+                    let cleanup_success = Self::run_remote_command(
                         host,
                         &format!(
-                            "rm -rf \"{}\" || del /f /q \"{}\"",
+                            "rm -rf \"{}\" || rmdir /s /q \"{}\"",
                             temp_to_path, temp_to_path
                         ),
+                        None,
                     )?;
 
-                    match cleanup_result {
-                        Some(..) => temp_result?,
-                        None => {
+                    match cleanup_success {
+                        true => temp_result?,
+                        false => {
+                            let mut msg =
+                                format!("Failed to remove temporary directory {}", temp_to_path);
+
                             if let Err(err) = temp_result {
-                                eprintln!("\n{}", err);
+                                msg = format!("{}\n{}", err, msg);
                             }
 
-                            return Err(format!(
-                                "Failed to remove temporary {} {}",
-                                type_str, temp_to_path
-                            )
-                            .into());
+                            return Err(msg.into());
                         }
                     }
                 } else {
-                    // Prevent creation of another directory inside existing directory
                     if from_is_dir {
-                        Self::run_remote_command(host, &format!("mkdir \"{}\"", to_path))?;
+                        // Ensure there is an existing directory
+                        Self::run_remote_command(host, &format!("mkdir \"{}\"", to_path), None)?;
+
+                        // Prevent the creation of another directory inside the existing directory
                         from = from.join("*");
                     }
 
