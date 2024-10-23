@@ -95,7 +95,7 @@ impl Builder {
             return Err(format!("Failed to transfer {} to {}", display_from, to).into());
         }
 
-        return Ok(());
+        Ok(())
     }
 
     fn do_step(&mut self, step: &Transformation, i: usize) -> Result<(), Box<dyn Error>> {
@@ -332,6 +332,6 @@ impl Builder {
             x => return Err(format!("Unknown type \"{}\" for instruction #{}", x, i).into()),
         }
 
-        return Ok(());
+        Ok(())
     }
 }
