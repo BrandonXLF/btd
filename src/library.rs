@@ -147,6 +147,28 @@ impl Library {
     pub fn delete_file(&self, name: Option<&str>) -> Result<(), Box<dyn Error>> {
         let path = self.get_existing_dir(name)?;
 
+        let actual_name = match name {
+            Some(name) => name.to_owned(),
+            None => path
+                .with_extension("")
+                .file_name()
+                .ok_or("Unknown file name")?
+                .to_string_lossy()
+                .into_owned(),
+        };
+
+        print!("\nAre you sure you want to delete {}? (Y/N): ", actual_name);
+        let _ = stdout().flush();
+
+        let mut res = String::new();
+        stdin().read_line(&mut res)?;
+
+        let trimmed = res.trim();
+
+        if !(trimmed == "Y" || trimmed == "y") {
+            return Err("Deletion aborted".into());
+        }
+
         remove_file(path).map_err(|_| "Failed to remove instruction file")?;
         Ok(())
     }
