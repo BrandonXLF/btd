@@ -82,7 +82,13 @@ impl Builder {
         Ok(res == "OK" || other_acceptable.map(|x| res == x).unwrap_or(false))
     }
 
-    fn deploy_scp(from: PathBuf, to: &str, display_from: &str) -> Result<(), Box<dyn Error>> {
+    fn deploy_scp(
+        from: PathBuf,
+        host: Option<&str>,
+        to: &str,
+        to_path: &str,
+        display_from: &str,
+    ) -> Result<(), Box<dyn Error>> {
         println!();
 
         let success = Command::new("scp")
@@ -90,6 +96,8 @@ impl Builder {
             .status()
             .map_err(|_| "Failed to execute scp")?
             .success();
+
+        let _ = Self::run_remote_command(host, &format!("chmod -R 775 \"{}\"", to_path), None)?;
 
         if !success {
             return Err(format!("Failed to transfer {} to {}", display_from, to).into());
@@ -258,7 +266,7 @@ impl Builder {
                     let temp_to_path = to_path.to_owned() + "-" + &date_str;
 
                     // Deploy to a temporary remote directory
-                    Self::deploy_scp(from, &temp_to, name)?;
+                    Self::deploy_scp(from, host, &temp_to, &temp_to_path, name)?;
 
                     let temp_result = (|| -> Result<(), Box<dyn Error>> {
                         // Make sure the target directory exists
@@ -326,7 +334,7 @@ impl Builder {
                         from = from.join("*");
                     }
 
-                    Self::deploy_scp(from, to, name)?;
+                    Self::deploy_scp(from, host, to, to_path, name)?;
                 }
             }
             x => return Err(format!("Unknown type \"{}\" for instruction #{}", x, i).into()),
