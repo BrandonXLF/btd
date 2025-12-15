@@ -9,6 +9,7 @@ repository = "https://github.com/BrandonXLF/btd"
 license = "GPL-3.0-or-later"
 keywords = ["cli", "build", "deploy", "deployment", "automation"]
 categories = ["command-line-utilities", "development-tools::build-utils"]
+exclude = [".*"]
 
 [dependencies]
 dirs = "5.0.1"
